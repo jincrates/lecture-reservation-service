@@ -34,7 +34,7 @@ class GlobalExceptionHandler {
     }
 
     /**
-     * ServerException에 정의되지 않은 Exception을 처리합니다.
+     * ServerException에 정의되지 않은 예외처리
      */
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception) : ErrorResponse {
