@@ -1,6 +1,7 @@
 package me.jincrates.lecturereservationservice.exception
 
 import mu.KotlinLogging
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import java.lang.Exception
@@ -17,6 +18,16 @@ class GlobalExceptionHandler {
     fun handleServerException(ex: ServerException) : ErrorResponse {
         logger.error { ex.message }  //에러 로깅
         return ErrorResponse(code = ex.code, message = ex.message)
+    }
+
+    /**
+     * Validate Error
+     */
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException) : ErrorResponse {
+        val errorMessage = ex.bindingResult.allErrors.get(0).defaultMessage.toString()
+        logger.error { errorMessage }  //에러 로깅
+        return ErrorResponse(code = 500, message = errorMessage)
     }
 
     /**
