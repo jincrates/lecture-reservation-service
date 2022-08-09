@@ -14,8 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -155,10 +154,75 @@ class RoomControllerTest {
     fun getRoom() {
         createRooms() //15개를 생성
 
-        val roomId = 15
-        mockMvc.perform(get("/api/v1/rooms/" + roomId))
+        val roomId = 12
+        mockMvc.perform(get("/api/v1/rooms/$roomId"))
             .andExpect(status().isOk)
             .andDo(print())
+    }
+
+    @Test
+    @DisplayName("강연장 수정 - 입력값 정상")
+    fun editRoomSuccess() {
+        createRooms()
+
+        val roomId = 12
+        val roomRequest = RoomRequest(
+            title = "테스트 강연장 - 수정",
+            limitOfPersons = 30,
+            status = CommonStatus.ACTIVE,
+        )
+        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
+        mockMvc.perform(put("/api/v1/rooms/$roomId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.title").value(roomRequest.title))
+            .andExpect(jsonPath("\$.limitOfPersons").value(roomRequest.limitOfPersons))
+            .andExpect(jsonPath("\$.status").value(roomRequest.status.toString()))
+            .andDo(print())
+
+        val room = roomRepository.findByTitle(roomRequest.title)
+
+        assertNotNull(room)
+        assertEquals(roomRequest.title, room?.title)
+        assertEquals(roomRequest.limitOfPersons, room?.limitOfPersons)
+        assertEquals(roomRequest.status, room?.status)
+    }
+
+    @Test
+    @DisplayName("강연장 수정 - 입력값 오류 - id 없음")
+    fun editRoomFail() {
+        createRooms()
+
+        val roomId = 99
+        val roomRequest = RoomRequest(
+            title = "테스트 강연장 - 수정",
+            limitOfPersons = 30,
+            status = CommonStatus.ACTIVE,
+        )
+        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
+        mockMvc.perform(put("/api/v1/rooms/$roomId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.code").value(404))
+            .andExpect(jsonPath("\$.message").value("강연장이 존재하지 않습니다."))
+            .andDo(print())
+    }
+
+    @Test
+    @DisplayName("강연장 삭제")
+    fun deleteRoom() {
+        createRooms()
+
+        val roomId = 12L
+        mockMvc.perform(delete("/api/v1/rooms/$roomId")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent)
+            .andDo(print())
+
+        val room = roomRepository.existsById(roomId)
+        assertFalse(room)
     }
 
     fun createRooms() {
@@ -166,7 +230,7 @@ class RoomControllerTest {
 
         for (i in 1..10) {
             val room = Room(
-                title = "테스트 강연장" + i,
+                title = "테스트 강연장$i",
                 limitOfPersons = 20 + i,
                 status = CommonStatus.ACTIVE,
             )
@@ -175,7 +239,7 @@ class RoomControllerTest {
 
         for (i in 11..15) {
             val room = Room(
-                title = "테스트 강연장" + i,
+                title = "테스트 강연장$i",
                 limitOfPersons = 20 + i,
                 status = CommonStatus.INACTIVE,
             )

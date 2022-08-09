@@ -22,7 +22,7 @@ class RoomService(
      * TODO: 강연장 등록자 정보를 추가해야할까?
      */
     @Transactional
-    fun create(userCode: String, request: RoomRequest): RoomResponse {
+    fun create(userId: String, request: RoomRequest): RoomResponse {
         val room = Room(
             title = request.title,
             limitOfPersons = request.limitOfPersons,
@@ -45,5 +45,27 @@ class RoomService(
     fun get(id: Long): RoomResponse {
         val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         return room.toResponse()
+    }
+
+    /**
+     * 강연장 수정
+     */
+    @Transactional
+    fun edit(userId: String, id: Long, request: RoomRequest): RoomResponse {
+        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        return with(room) {
+            title = request.title
+            limitOfPersons = request.limitOfPersons
+            status = request.status
+            roomRepository.save(this).toResponse()
+        }
+    }
+
+    /**
+     * 강연장 삭제
+     */
+    @Transactional
+    fun delete(id: Long) {
+        roomRepository.deleteById(id)
     }
 }

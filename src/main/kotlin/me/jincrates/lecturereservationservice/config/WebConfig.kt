@@ -34,8 +34,7 @@ class AuthUserHandlerArgumentsResolver : HandlerMethodArgumentResolver {
     ): Any? {
 
         return AuthUser(
-            userId = 1,
-            userCode = "94042",
+            userId = "94042",
             username = "사용자"
         )
     }
@@ -43,7 +42,6 @@ class AuthUserHandlerArgumentsResolver : HandlerMethodArgumentResolver {
 }
 
 data class AuthUser(
-    val userId: Long,
-    val userCode: String,  //사원번호
+    val userId: String,      //사원번호
     val username: String,  //사원명
 )
