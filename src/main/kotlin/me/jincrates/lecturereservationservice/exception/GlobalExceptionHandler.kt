@@ -21,7 +21,7 @@ class GlobalExceptionHandler {
     }
 
     /**
-     * Validate Error
+     * 필드 유효성 에러처리
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException) : ErrorResponse {
