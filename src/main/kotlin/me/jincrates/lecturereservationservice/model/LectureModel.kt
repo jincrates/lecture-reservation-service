@@ -2,6 +2,7 @@ package me.jincrates.lecturereservationservice.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import me.jincrates.lecturereservationservice.domain.Lecture
+import me.jincrates.lecturereservationservice.domain.Reservation
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import javax.validation.constraints.Min
@@ -47,6 +48,8 @@ data class LectureResponse(
     val title: String,   //강연 제목
 
     val description: String,
+
+    val reservations: List<ReservationResponse> = emptyList(),
 )
 
 fun Lecture.toResponse() = LectureResponse(
@@ -58,4 +61,5 @@ fun Lecture.toResponse() = LectureResponse(
     closedAt = closedAt,
     title = title,
     description = description,
+    reservations = reservations.sortedByDescending(Reservation::id).map(Reservation::toResponse),
 )

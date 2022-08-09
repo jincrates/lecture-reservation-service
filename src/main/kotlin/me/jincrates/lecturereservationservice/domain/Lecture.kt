@@ -28,10 +28,12 @@ class Lecture (
     @Column(nullable = false)
     val title: String,   //강연 제목
 
+    @Column
     @Lob @Basic(fetch = FetchType.EAGER)
     val description: String,  //상세 내용
 
-    @OneToMany(mappedBy = "lecture", fetch = FetchType.EAGER)
-    val reservations: MutableList<Reservation> = mutableListOf()
+    //하나의 강의에 여러 예약이 있을 수 있기 떄문
+    @OneToMany(fetch = FetchType.EAGER)
+    val reservations: MutableList<Reservation> = mutableListOf(),
 
 ) : BaseEntity()
