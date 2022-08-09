@@ -25,7 +25,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException) : ErrorResponse {
-        val errorMessage = ex.bindingResult.allErrors.get(0).defaultMessage.toString()
+        val errorMessage = ex.bindingResult.allErrors[0].defaultMessage.toString()
         logger.error { errorMessage }  //에러 로깅
         return ErrorResponse(code = 500, message = errorMessage)
     }
