@@ -34,6 +34,9 @@ dependencies {
 	runtimeOnly("mysql:mysql-connector-java")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// Kotlin 로깅
+	implementation("io.github.microutils:kotlin-logging:1.12.5")
 }
 
 tasks.withType<KotlinCompile> {
