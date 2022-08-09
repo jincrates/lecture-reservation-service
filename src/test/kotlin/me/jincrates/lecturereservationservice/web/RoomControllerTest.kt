@@ -1,6 +1,7 @@
 package me.jincrates.lecturereservationservice.web
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.RoomRepository
 import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import me.jincrates.lecturereservationservice.model.RoomRequest
@@ -13,13 +14,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.transaction.annotation.Transactional
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
+import org.springframework.util.LinkedMultiValueMap
+import java.util.stream.IntStream
 
 @Transactional
 @SpringBootTest
@@ -126,4 +128,60 @@ class RoomControllerTest {
         assertNull(room)
     }
 
+    @Test
+    @DisplayName("강연장 전체 조회 - 기본값(ACTIVE)")
+    fun getAllRoom() {
+        createRooms() //15개를 생성
+        mockMvc.perform(get("/api/v1/rooms"))
+            .andExpect(status().isOk)
+            .andDo(print())
+    }
+
+    @Test
+    @DisplayName("강연장 전체 조회 - INACTIVE")
+    fun getAllRoomInactive() {
+        createRooms() //15개를 생성
+
+        val queryParams = LinkedMultiValueMap<String, String>()
+        queryParams.add("status", "INACTIVE")
+
+        mockMvc.perform(get("/api/v1/rooms").queryParams(queryParams))
+            .andExpect(status().isOk)
+            .andDo(print())
+    }
+
+    @Test
+    @DisplayName("강연장 상세 조회")
+    fun getRoom() {
+        createRooms() //15개를 생성
+
+        val roomId = 15
+        mockMvc.perform(get("/api/v1/rooms/" + roomId))
+            .andExpect(status().isOk)
+            .andDo(print())
+    }
+
+    fun createRooms() {
+        val rooms = mutableListOf<Room>()
+
+        for (i in 1..10) {
+            val room = Room(
+                title = "테스트 강연장" + i,
+                limitOfPersons = 20 + i,
+                status = CommonStatus.ACTIVE,
+            )
+            rooms.add(room)
+        }
+
+        for (i in 11..15) {
+            val room = Room(
+                title = "테스트 강연장" + i,
+                limitOfPersons = 20 + i,
+                status = CommonStatus.INACTIVE,
+            )
+            rooms.add(room)
+        }
+
+        roomRepository.saveAll(rooms)
+    }
 }
