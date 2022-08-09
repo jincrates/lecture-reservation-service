@@ -14,6 +14,9 @@ class GlobalExceptionHandler {
 
     private val logger = KotlinLogging.logger {}
 
+    /**
+     * 런타임 오류에 대한 에러처리
+     */
     @ExceptionHandler(ServerException::class)
     fun handleServerException(ex: ServerException) : ErrorResponse {
         logger.error { ex.message }  //에러 로깅
