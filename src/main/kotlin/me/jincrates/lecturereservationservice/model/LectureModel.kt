@@ -55,6 +55,8 @@ data class LectureResponse(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val closedAt: LocalDateTime,   //강연종료일시
 
+    val createdBy: String,
+
     val reservations: List<ReservationResponse> = emptyList(),
 )
 
@@ -67,5 +69,6 @@ fun Lecture.toResponse() = LectureResponse(
     limitOfReservations = limitOfReservations,
     openedAt = openedAt,
     closedAt = closedAt,
+    createdBy = createdBy,
     reservations = reservations.sortedByDescending(Reservation::id).map(Reservation::toResponse),
 )

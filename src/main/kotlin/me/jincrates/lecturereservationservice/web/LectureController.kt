@@ -8,16 +8,10 @@ import me.jincrates.lecturereservationservice.model.LectureResponse
 import me.jincrates.lecturereservationservice.service.LectureService
 import mu.KLogger
 import mu.KotlinLogging
+import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
 import org.springframework.web.bind.WebDataBinder
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
@@ -31,7 +25,7 @@ class LectureController(
     //지정한 객체로 요청이 들어올 경우 lectureValidator를 우선 실행
     @InitBinder("lectureRequest")
     fun initBinder(webDataBinder: WebDataBinder) {
-        logger.info{ "webDataBinder=" + webDataBinder + ", target=" + webDataBinder.target }
+        //logger.info{ "webDataBinder=" + webDataBinder + ", target=" + webDataBinder.target }
         webDataBinder.addValidators(lectureValidator)
     }
 
@@ -42,6 +36,7 @@ class LectureController(
         @Valid @RequestBody request: LectureRequest,
     ) = lectureService.createLecture(roomId, authUser.userId, request)
 
+    //TODO: 날짜 조건 추가 필요: 강연시작시간 1주일 전에 노출, 강연시작 1일 후 노출목록에서 사라짐
     @GetMapping()
     fun getAll(
         authUser: AuthUser,
@@ -61,4 +56,12 @@ class LectureController(
         @PathVariable lectureId: Long,
         @Valid @RequestBody request: LectureRequest,
     ) = lectureService.updateLecture(lectureId, request)
+
+    @DeleteMapping("/{lectureId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteLecture(
+        authUser: AuthUser,
+        @PathVariable roomId: Long,
+        @PathVariable lectureId: Long,
+    ) = lectureService.deleteLecture(roomId, lectureId);
 }

@@ -20,7 +20,7 @@ class LectureService(
      * 강연 등록
      */
     @Transactional
-    fun createLecture(roomId: Long, userId: String, request: LectureRequest): LectureResponse {
+    fun createLecture(roomId: Long, createdBy: String, request: LectureRequest): LectureResponse {
         val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
 
         val lecture = Lecture(
@@ -31,6 +31,7 @@ class LectureService(
             limitOfReservations = request.limitOfReservations,
             openedAt = request.openedAt,
             closedAt = request.closedAt,
+            createdBy = createdBy
         )
         room.lectures.add(lecture)
         return lectureRepository.save(lecture).toResponse()
@@ -38,7 +39,6 @@ class LectureService(
 
     /**
      * 강연 전체 조회
-     * TODO: 날짜 조건 추가 필요
      */
     @Transactional(readOnly = true)
     fun getAll(roomId: Long) = lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface RoomRepository : JpaRepository<Room, Long> {
     fun findByTitle(title: String): Room?
     fun findAllByStatusOrderByCreatedAtDesc(status: CommonStatus): List<Room>?
-
+    fun findByIdAndCreatedBy(id: Long, createdBy: String): Room?
 }

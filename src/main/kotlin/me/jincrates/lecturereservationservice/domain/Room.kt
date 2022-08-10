@@ -20,6 +20,9 @@ class Room (
     @Enumerated(EnumType.STRING)
     var status: CommonStatus,  // 상태
 
+    @Column(nullable = false)
+    var createdBy: String,   //생성자 사번
+
     @OneToMany(fetch = FetchType.EAGER)
     val lectures: MutableList<Lecture> = mutableListOf(),
 

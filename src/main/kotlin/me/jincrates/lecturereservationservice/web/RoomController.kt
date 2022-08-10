@@ -46,7 +46,7 @@ class RoomController(
         authUser: AuthUser,
         @PathVariable id: Long,
         @Valid @RequestBody request: RoomRequest,
-    ) = roomService.updateRoom(authUser.userId, id, request)
+    ) = roomService.updateRoom(id, request)
 
     @PutMapping("/{id}/{status}")
     fun updateRoomStatus(
@@ -60,7 +60,5 @@ class RoomController(
     fun deleteRoom(
         authUser: AuthUser,
         @PathVariable id: Long,
-    ) {
-        roomService.deleteRoom(id);
-    }
+    ) = roomService.deleteRoom(id);
 }
