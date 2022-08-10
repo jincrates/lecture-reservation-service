@@ -10,7 +10,6 @@ import me.jincrates.lecturereservationservice.model.toResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.bind.annotation.PostMapping
 
 @Service
 class RoomService(
@@ -22,7 +21,7 @@ class RoomService(
      * TODO: 강연장 등록자 정보를 추가해야할까?
      */
     @Transactional
-    fun create(userId: String, request: RoomRequest): RoomResponse {
+    fun createRoom(userId: String, request: RoomRequest): RoomResponse {
         val room = Room(
             title = request.title,
             limitOfPersons = request.limitOfPersons,
@@ -42,7 +41,7 @@ class RoomService(
      * 강연장 상세 조회
      */
     @Transactional(readOnly = true)
-    fun get(id: Long): RoomResponse {
+    fun getRoom(id: Long): RoomResponse {
         val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         return room.toResponse()
     }
@@ -51,7 +50,7 @@ class RoomService(
      * 강연장 수정
      */
     @Transactional
-    fun edit(userId: String, id: Long, request: RoomRequest): RoomResponse {
+    fun updateRoom(userId: String, id: Long, request: RoomRequest): RoomResponse {
         val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         return with(room) {
             title = request.title
@@ -62,10 +61,21 @@ class RoomService(
     }
 
     /**
+     * 강연장 상태변경
+     */
+    @Transactional
+    fun updateRoomStatus(id: Long, status: String): RoomResponse {
+        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        room.status = CommonStatus(status)
+        return roomRepository.save(room).toResponse()
+    }
+
+    /**
      * 강연장 삭제
      */
     @Transactional
-    fun delete(id: Long) {
+    fun deleteRoom(id: Long) {
+        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         roomRepository.deleteById(id)
     }
 }

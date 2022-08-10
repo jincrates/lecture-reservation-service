@@ -18,16 +18,16 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api/v1/rooms")
+@RequestMapping("/api/v1/admin/rooms")  //TODO: 어드민(BackOffice) 권한 가진자만 가능해야할 것으로 보임
 class RoomController(
     private val roomService: RoomService,
 ) {
 
     @PostMapping()
-    fun create(
+    fun createRoom(
         authUser: AuthUser, // memberId: Long,  // TODO: 사용자 인증처리가 필요하지 않을까
         @Valid @RequestBody request: RoomRequest,
-    ) = roomService.create(authUser.userId, request)
+    ) = roomService.createRoom(authUser.userId, request)
 
     @GetMapping()
     fun getAll(
@@ -36,24 +36,31 @@ class RoomController(
     ) = roomService.getAll(status)
 
     @GetMapping("/{id}")
-    fun get(
+    fun getRoom(
         authUser: AuthUser,
         @PathVariable id: Long,
-    ) = roomService.get(id)
+    ) = roomService.getRoom(id)
 
     @PutMapping("/{id}")
-    fun edit(
+    fun updateRoom(
         authUser: AuthUser,
         @PathVariable id: Long,
         @Valid @RequestBody request: RoomRequest,
-    ) = roomService.edit(authUser.userId, id, request)
+    ) = roomService.updateRoom(authUser.userId, id, request)
+
+    @PutMapping("/{id}/{status}")
+    fun updateRoomStatus(
+        authUser: AuthUser,
+        @PathVariable id: Long,
+        @PathVariable status: String,
+    ) = roomService.updateRoomStatus(id, status)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun delete(
+    fun deleteRoom(
         authUser: AuthUser,
         @PathVariable id: Long,
     ) {
-        roomService.delete(id);
+        roomService.deleteRoom(id);
     }
 }

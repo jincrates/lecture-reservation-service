@@ -17,6 +17,7 @@ class Room (
     var limitOfPersons: Int,  // 수용인원
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     var status: CommonStatus,  // 상태: TODO: 기본값 설정을 해야할까
 
 ) : BaseEntity()
