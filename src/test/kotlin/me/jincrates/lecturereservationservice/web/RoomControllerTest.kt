@@ -7,6 +7,7 @@ import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import me.jincrates.lecturereservationservice.model.RoomRequest
 import org.hibernate.validator.constraints.Length
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,6 +30,9 @@ class RoomControllerTest {
 
     @Autowired lateinit var mockMvc: MockMvc
     @Autowired lateinit var roomRepository: RoomRepository
+
+    @BeforeEach
+    fun beforeEach() = roomRepository.deleteAll()
 
     @Test
     @DisplayName("강연장 등록 - 입력값 정상")
@@ -165,7 +169,7 @@ class RoomControllerTest {
     fun editRoomSuccess() {
         createRooms()
 
-        val roomId = 12
+        val roomId: Long = 10
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
             limitOfPersons = 30,
@@ -194,7 +198,7 @@ class RoomControllerTest {
     fun editRoomFail() {
         createRooms()
 
-        val roomId = 99
+        val roomId: Long = 99
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
             limitOfPersons = 30,
@@ -213,9 +217,10 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 삭제")
     fun deleteRoom() {
+
         createRooms()
 
-        val roomId = 12L
+        val roomId: Long = 10
         mockMvc.perform(delete("/api/v1/rooms/$roomId")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent)

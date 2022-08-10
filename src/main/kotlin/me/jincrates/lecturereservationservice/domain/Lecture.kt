@@ -28,7 +28,7 @@ class Lecture (
     @Column(nullable = false)
     val title: String,   //강연 제목
 
-    @Column
+    @Column(nullable = false)
     @Lob @Basic(fetch = FetchType.EAGER)
     val description: String,  //상세 내용
 
