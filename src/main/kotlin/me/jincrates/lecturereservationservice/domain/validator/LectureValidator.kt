@@ -1,7 +1,6 @@
 package me.jincrates.lecturereservationservice.domain.validator
 
 import me.jincrates.lecturereservationservice.model.LectureRequest
-import me.jincrates.lecturereservationservice.model.LectureResponse
 import org.springframework.stereotype.Component
 import org.springframework.validation.Errors
 import org.springframework.validation.Validator
@@ -17,18 +16,18 @@ class LectureValidator : Validator {
     override fun validate(target: Any, errors: Errors) {
         val request : LectureRequest = target as LectureRequest
 
-        if (isNotValidCreatedAt(request)) {
-            errors.rejectValue("createdAt", "강연시작일시를 정확히 입력하세요.")
+        if (isNotValidOpenedAt(request)) {
+            errors.rejectValue("openedAt", "invalid.createdAt", "강연 시작일시를 정확히 입력하세요.")
         }
 
         if (isNotValidClosedAt(request)) {
-            errors.rejectValue("closedAt", "강연종료일시를 정확히 입력하세요.")
+            errors.rejectValue("closedAt", "invalid.closedAt", "강연 종료일시를 정확히 입력하세요.")
         }
     }
 
-    private fun isNotValidClosedAt(request: LectureRequest) =
-        request.closedAt.isBefore(request.closedAt)
-
-    private fun isNotValidCreatedAt(request: LectureRequest) =
+    private fun isNotValidOpenedAt(request: LectureRequest) =
         request.openedAt.isBefore(LocalDateTime.now())
+
+    private fun isNotValidClosedAt(request: LectureRequest) =
+        request.closedAt.isBefore(request.openedAt)
 }
