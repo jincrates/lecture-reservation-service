@@ -9,6 +9,7 @@ import me.jincrates.lecturereservationservice.model.LectureResponse
 import me.jincrates.lecturereservationservice.model.toResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -20,6 +21,7 @@ class LectureService(
     /**
      * 강연 등록
      */
+    @Transactional
     fun create(roomId: Long, userId: String, request: LectureRequest): LectureResponse {
         val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
 
@@ -28,13 +30,30 @@ class LectureService(
             title = request.title,
             description = request.description,
             lecturerName = request.lecturerName,
-            numberOfReservations = request.numberOfReservations,
-            openedAt = LocalDateTime.parse(request.openedAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-            closedAt = LocalDateTime.parse(request.closedAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            limitOfReservations = request.limitOfReservations,
+            openedAt = request.openedAt,
+            closedAt = request.closedAt,
         )
 
-        //강연장 인원제한 수와 강연 신청인원 수를 비교해야함
+        //TODO: 강연장 인원제한 수와 강연 신청인원 수를 비교해야함
+        //TODO: 예약마감인원과 강의실 수용인원 비교
 
         return lectureRepository.save(lecture).toResponse()
     }
+
+    /**
+     * 강연 전체 조회
+     * TODO: 날짜 조건 추가 필요
+     */
+    @Transactional(readOnly = true)
+    fun getAll(roomId: Long) = lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }
+
+    fun get(roomId: Long, lectureId: Long): LectureResponse {
+        roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        return lecture.toResponse()
+    }
+
+
+
 }

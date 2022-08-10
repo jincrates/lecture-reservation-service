@@ -23,6 +23,5 @@ class StringFormatDateTimeValidator : ConstraintValidator<StringFormatDateTime, 
         } catch (e: Exception) {
             false
         }
-
     }
 }

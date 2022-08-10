@@ -37,6 +37,10 @@ dependencies {
 
 	// Kotlin 로깅
 	implementation("io.github.microutils:kotlin-logging:1.12.5")
+
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3")
+
 }
 
 tasks.withType<KotlinCompile> {

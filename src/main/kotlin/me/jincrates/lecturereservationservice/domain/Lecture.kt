@@ -17,7 +17,7 @@ class Lecture (
     val lecturerName: String,  //강연자명
 
     @Column(nullable = false)
-    val numberOfReservations: Int,  //예약인원
+    val limitOfReservations: Int,  //예약(신청)마감인원
 
     @Column(nullable = false)
     val openedAt: LocalDateTime,   //강연시작일시

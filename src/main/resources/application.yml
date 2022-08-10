@@ -8,7 +8,7 @@ spring:
                 show_sql: true
 
     datasource:
-        driverClassName: com.mysql.jdbc.Driver
+        driver-class-name: com.mysql.cj.jdbc.Driver
         url: jdbc:mysql://localhost:3306/lecture-reservation-service
         username: bootuser
         password: bootuser

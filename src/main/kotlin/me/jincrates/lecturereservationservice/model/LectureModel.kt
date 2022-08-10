@@ -1,12 +1,12 @@
 package me.jincrates.lecturereservationservice.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.Reservation
 import me.jincrates.lecturereservationservice.domain.annotation.StringFormatDateTime
 import org.hibernate.validator.constraints.Length
+import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
@@ -23,14 +23,16 @@ data class LectureRequest(
     @field: NotBlank(message = "강연자명을 입력하지 않았습니다.")
     val lecturerName: String,
 
-    //@field: Min(1)
-    val numberOfReservations: Int = 0,
+    @field: Min(value = 1, message = "예약 마감인원은 1명 이상이여야 합니다.")
+    val limitOfReservations: Int,
 
-    @field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
-    val openedAt: String,
+    //@field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val openedAt: LocalDateTime,
 
-    @field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
-    val closedAt: String,
+    //@field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val closedAt: LocalDateTime,
 )
 
 data class LectureResponse(
@@ -45,12 +47,12 @@ data class LectureResponse(
 
     val lecturerName: String,  //강연자명
 
-    val numberOfReservations: Int,
+    val limitOfReservations: Int,  //예약(신청)마감인원
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val openedAt: LocalDateTime,   //강연시작일시
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val closedAt: LocalDateTime,   //강연종료일시
 
     val reservations: List<ReservationResponse> = emptyList(),
@@ -62,7 +64,7 @@ fun Lecture.toResponse() = LectureResponse(
     title = title,
     description = description,
     lecturerName = lecturerName,
-    numberOfReservations = numberOfReservations,
+    limitOfReservations = limitOfReservations,
     openedAt = openedAt,
     closedAt = closedAt,
     reservations = reservations.sortedByDescending(Reservation::id).map(Reservation::toResponse),
