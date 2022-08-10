@@ -19,9 +19,6 @@ class Reservation(
     var userId: String,   //신청자 사번
 
     @Column(nullable = false)
-    var reservedAt: LocalDateTime,   //예약일자
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var status: ReservationStatus,   //예약상태
 

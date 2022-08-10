@@ -39,7 +39,6 @@ class ReservationService(
         val reservation = Reservation(
             lecture = lecture,
             userId = request.userId,
-            reservedAt = LocalDateTime.now(),
             status = status,
         )
         lecture.reservations.add(reservation)
@@ -52,12 +51,18 @@ class ReservationService(
         return reservation.toResponse()
     }
 
+    @Transactional(readOnly = true)
+    fun getReservationByUserId(userId: String): List<ReservationResponse> {
+        val reservation = reservationRepository.findByUserId(userId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return reservation.map { it.toResponse() }
+    }
+
     @Transactional
     fun updateReservation(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
             userId = request.userId
-            status = request.status!!
+            status = ReservationStatus(request.status!!)
             reservationRepository.save(this).toResponse()
         }
     }
@@ -98,4 +103,6 @@ class ReservationService(
             lecture.reservations.remove(reservation)
         }
     }
+
+
 }
