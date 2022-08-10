@@ -19,6 +19,9 @@ class ReservationService(
     private val lectureRepository: LectureRepository,
     private val reservationRepository: ReservationRepository,
 ) {
+    /**
+     * 강연 예약신청
+     */
     @Transactional
     fun createReservation(lectureId: Long, request: ReservationRequest): ReservationResponse {
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
@@ -41,5 +44,58 @@ class ReservationService(
         )
         lecture.reservations.add(reservation)
         return reservationRepository.save(reservation).toResponse()
+    }
+
+    @Transactional(readOnly = true)
+    fun getReservationById(reservationId: Long): ReservationResponse {
+        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return reservation.toResponse()
+    }
+
+    @Transactional
+    fun updateReservation(reservationId: Long, request: ReservationRequest): ReservationResponse? {
+        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return with(reservation) {
+            userId = request.userId
+            status = request.status!!
+            reservationRepository.save(this).toResponse()
+        }
+    }
+    @Transactional
+    fun updateStatusToApproval(reservationId: Long, request: ReservationRequest): ReservationResponse? {
+        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return with(reservation) {
+            userId = request.userId
+            status = ReservationStatus.APPROVAL
+            reservationRepository.save(this).toResponse()
+        }
+    }
+
+    @Transactional
+    fun updateStatusToWaiting(reservationId: Long, request: ReservationRequest): ReservationResponse? {
+        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return with(reservation) {
+            userId = request.userId
+            status = ReservationStatus.WAITING
+            reservationRepository.save(this).toResponse()
+        }
+    }
+
+    @Transactional
+    fun updateStatusToCancel(reservationId: Long, request: ReservationRequest): ReservationResponse? {
+        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        return with(reservation) {
+            userId = request.userId
+            status = ReservationStatus.CANCEL
+            reservationRepository.save(this).toResponse()
+        }
+    }
+
+    @Transactional
+    fun deleteReservation(lectureId: Long, reservationId: Long) {
+        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        reservationRepository.findByIdOrNull(reservationId)?.let { reservation ->
+            lecture.reservations.remove(reservation)
+        }
     }
 }
