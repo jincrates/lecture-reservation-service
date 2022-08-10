@@ -17,12 +17,18 @@ class LectureValidator : Validator {
     override fun validate(target: Any, errors: Errors) {
         val request : LectureRequest = target as LectureRequest
 
-        if (request.openedAt.isBefore(LocalDateTime.now())) {
+        if (isNotValidCreatedAt(request)) {
             errors.rejectValue("createdAt", "강연시작일시를 정확히 입력하세요.")
         }
 
-        if (request.closedAt.isBefore(request.closedAt)) {
-            errors.rejectValue("createdAt", "강연종료일시를 정확히 입력하세요.")
+        if (isNotValidClosedAt(request)) {
+            errors.rejectValue("closedAt", "강연종료일시를 정확히 입력하세요.")
         }
     }
+
+    private fun isNotValidClosedAt(request: LectureRequest) =
+        request.closedAt.isBefore(request.closedAt)
+
+    private fun isNotValidCreatedAt(request: LectureRequest) =
+        request.openedAt.isBefore(LocalDateTime.now())
 }
