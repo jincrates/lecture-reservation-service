@@ -37,9 +37,9 @@ data class RoomResponse(
 
     val status: CommonStatus,
 
-    val createdBy: String,
-
     val lectures: List<LectureResponse> = emptyList(),
+
+    val createdBy: String,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val createdAt: LocalDateTime?,
@@ -56,8 +56,8 @@ fun Room.toResponse() = RoomResponse(
     title = title,
     limitOfPersons = limitOfPersons,
     status = status,
-    createdBy = createdBy,
     lectures = lectures.sortedByDescending(Lecture::id).map(Lecture::toResponse),
+    createdBy = createdBy,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

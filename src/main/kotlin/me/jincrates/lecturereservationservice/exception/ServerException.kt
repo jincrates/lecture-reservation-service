@@ -13,3 +13,7 @@ sealed class ServerException(
 data class NotFoundException(
     override val message: String
 ) : ServerException(404, message)
+
+data class BadRequestException(
+    override val message: String
+) : ServerException(400, message)
