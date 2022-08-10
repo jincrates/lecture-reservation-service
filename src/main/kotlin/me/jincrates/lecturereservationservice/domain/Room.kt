@@ -18,6 +18,9 @@ class Room (
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var status: CommonStatus,  // 상태: TODO: 기본값 설정을 해야할까
+    var status: CommonStatus,  // 상태
+
+    @OneToMany(fetch = FetchType.EAGER)
+    val lectures: MutableList<Lecture> = mutableListOf(),
 
 ) : BaseEntity()

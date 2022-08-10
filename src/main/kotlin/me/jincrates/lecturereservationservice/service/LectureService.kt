@@ -10,8 +10,6 @@ import me.jincrates.lecturereservationservice.model.toResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Service
 class LectureService(
@@ -22,7 +20,7 @@ class LectureService(
      * 강연 등록
      */
     @Transactional
-    fun create(roomId: Long, userId: String, request: LectureRequest): LectureResponse {
+    fun createLecture(roomId: Long, userId: String, request: LectureRequest): LectureResponse {
         val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
 
         val lecture = Lecture(
@@ -34,10 +32,7 @@ class LectureService(
             openedAt = request.openedAt,
             closedAt = request.closedAt,
         )
-
-        //TODO: 강연장 인원제한 수와 강연 신청인원 수를 비교해야함
-        //TODO: 예약마감인원과 강의실 수용인원 비교
-
+        room.lectures.add(lecture)
         return lectureRepository.save(lecture).toResponse()
     }
 
@@ -48,12 +43,35 @@ class LectureService(
     @Transactional(readOnly = true)
     fun getAll(roomId: Long) = lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }
 
-    fun get(roomId: Long, lectureId: Long): LectureResponse {
+    @Transactional(readOnly = true)
+    fun getLecture(roomId: Long, lectureId: Long): LectureResponse {
         roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         return lecture.toResponse()
     }
 
+    /**
+     * 강연 수정
+     */
+    @Transactional
+    fun updateLecture(lectureId: Long, request: LectureRequest): LectureResponse {
+        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        return with(lecture) {
+            title = request.title
+            description = request.description
+            lecturerName = request.lecturerName
+            limitOfReservations = request.limitOfReservations
+            openedAt = request.openedAt
+            closedAt = request.closedAt
+            lectureRepository.save(this).toResponse()
+        }
+    }
 
-
+    @Transactional
+    fun deleteLecture(roomId: Long, lectureId: Long) {
+        val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        lectureRepository.findByIdOrNull(lectureId)?.let { lecture ->
+            room.lectures.remove(lecture)
+        }
+    }
 }

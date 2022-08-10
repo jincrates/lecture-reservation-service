@@ -1,6 +1,7 @@
 package me.jincrates.lecturereservationservice.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import org.hibernate.validator.constraints.Length
@@ -36,6 +37,8 @@ data class RoomResponse(
 
     val status: CommonStatus,
 
+    val lectures: List<LectureResponse> = emptyList(),
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val createdAt: LocalDateTime?,
 
@@ -48,6 +51,7 @@ data class RoomResponse(
  */
 fun Room.toResponse() = RoomResponse(
     id = id!!,
+    lectures = lectures.sortedByDescending(Lecture::id).map(Lecture::toResponse),
     title = title,
     limitOfPersons = limitOfPersons,
     status = status,
