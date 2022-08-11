@@ -29,8 +29,6 @@ class LectureController(
         webDataBinder.addValidators(lectureValidator)
     }
 
-    //TODO: 중복강의 등록 불가 - 동일 시간에 동일 강의실 강연이 있는경우
-    //TODO: 강연장 수용인원보다 예약마감인원은 작아야한다.
     @PostMapping()
     fun createLecture(
         authUser: AuthUser,
@@ -38,12 +36,13 @@ class LectureController(
         @Valid @RequestBody request: LectureRequest,
     ) = lectureService.createLecture(roomId, authUser.userId, request)
 
-    //TODO: 날짜 조건 추가 필요: 강연시작시간 1주일 전에 노출, 강연시작 1일 후 노출목록에서 사라짐
     @GetMapping()
     fun getAll(
         authUser: AuthUser,
         @PathVariable roomId: Long,
-    ) = lectureService.getAll(roomId)
+        @RequestParam(required = false, name = "beforeDays", defaultValue = "7") beforeDays: Long,
+        @RequestParam(required = false, name = "afterDays", defaultValue = "1") afterDays: Long
+    ) = lectureService.getAllBeforeDaysBetween(roomId, beforeDays, afterDays)
 
     @GetMapping("/{lectureId}")
     fun getLecture(

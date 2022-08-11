@@ -78,3 +78,36 @@ fun Lecture.toResponse() = LectureResponse(
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
+
+
+data class LectureOnlyResponse(
+
+    val id: Long? = null,
+
+    val roomId: Long,
+
+    val title: String,   //강연 제목
+
+    val description: String,  //강연 상세내용
+
+    val lecturerName: String,  //강연자명
+
+    val limitOfReservations: Int,  //예약(신청)마감인원
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val openedAt: LocalDateTime,   //강연시작일시
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val closedAt: LocalDateTime,   //강연종료일시
+)
+
+fun Lecture.toResponseLectureOnly() = LectureOnlyResponse(
+    id = id!!,
+    roomId = room.id!!,
+    title = title,
+    description = description,
+    lecturerName = lecturerName,
+    limitOfReservations = limitOfReservations,
+    openedAt = openedAt,
+    closedAt = closedAt,
+)

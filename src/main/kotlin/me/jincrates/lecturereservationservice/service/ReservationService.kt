@@ -6,13 +6,10 @@ import me.jincrates.lecturereservationservice.domain.ReservationRepository
 import me.jincrates.lecturereservationservice.domain.enums.ReservationStatus
 import me.jincrates.lecturereservationservice.exception.BadRequestException
 import me.jincrates.lecturereservationservice.exception.NotFoundException
-import me.jincrates.lecturereservationservice.model.ReservationRequest
-import me.jincrates.lecturereservationservice.model.ReservationResponse
-import me.jincrates.lecturereservationservice.model.toResponse
+import me.jincrates.lecturereservationservice.model.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class ReservationService(
@@ -47,16 +44,28 @@ class ReservationService(
         return reservationRepository.save(reservation).toResponse()
     }
 
+    /**
+     * 예약 상세 조회
+     */
     @Transactional(readOnly = true)
     fun getReservationById(reservationId: Long): ReservationResponse {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return reservation.toResponse()
     }
 
+    /**
+     * 예약 조회(사번)
+     * 사번으로 신청한 강의 목록을 볼 수 있다.
+     */
     @Transactional(readOnly = true)
-    fun getReservationByUserId(userId: String): List<ReservationResponse> {
-        val reservation = reservationRepository.findByUserId(userId) ?: throw NotFoundException("예약 내역이 없습니다.")
-        return reservation.map { it.toResponse() }
+    fun getReservationByUserId(userId: String): List<ReservationDetailResponse> {
+        val reservation = if (reservationRepository.existsByUserId(userId)) {
+            reservationRepository.findByUserId(userId)
+        } else {
+            throw NotFoundException("예약 내역이 없습니다.")
+        }
+
+        return reservation!!.map { it.toDetailResponse() }
     }
 
     @Transactional
@@ -68,6 +77,7 @@ class ReservationService(
             reservationRepository.save(this).toResponse()
         }
     }
+
     @Transactional
     fun updateStatusToApproval(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")

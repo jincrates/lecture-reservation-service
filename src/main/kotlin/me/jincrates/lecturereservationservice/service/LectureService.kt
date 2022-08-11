@@ -11,6 +11,8 @@ import me.jincrates.lecturereservationservice.model.toResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Service
 class LectureService(
@@ -28,6 +30,7 @@ class LectureService(
             throw BadRequestException("예약 마감인원은 강연장 수용인원보다 클 수 없습니다.")
         }
 
+        //open at만 조건 처리가 됨
         if (lectureRepository.existsByRoomIdAndOpenedAtBetween(roomId, request.openedAt, request.closedAt)) {
             throw BadRequestException("해당 시간에 이미 신청된 강의가 존재합니다.")
         }
@@ -50,7 +53,20 @@ class LectureService(
      * 강연 전체 조회
      */
     @Transactional(readOnly = true)
-    fun getAll(roomId: Long) = lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }
+    fun getAll(roomId: Long) =
+        lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }
+
+    /**
+     * 강연 전체 조회(기간)
+     */
+    @Transactional(readOnly = true)
+    fun getAllBeforeDaysBetween(roomId: Long, beforeDays: Long, afterDays: Long): List<LectureResponse>? {
+        val now = LocalDate.now()
+        val fromDate = now.atStartOfDay().minusDays(beforeDays)
+        val toDate = now.atTime(LocalTime.MAX).plusDays(afterDays)
+        return lectureRepository.findByRoomIdAndOpenedAtBetween(roomId, fromDate, toDate)
+            ?.map { it.toResponse() }
+    }
 
     @Transactional(readOnly = true)
     fun getLecture(roomId: Long, lectureId: Long): LectureResponse {

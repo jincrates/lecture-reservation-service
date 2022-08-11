@@ -1,7 +1,6 @@
 package me.jincrates.lecturereservationservice.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.Reservation
 import me.jincrates.lecturereservationservice.domain.enums.ReservationStatus
 import org.hibernate.validator.constraints.Length
@@ -41,4 +40,30 @@ fun Reservation.toResponse() = ReservationResponse(
     status = status,
     createdAt = createdAt,
     updatedAt = updatedAt
+)
+
+data class ReservationDetailResponse(
+
+    val id: Long? = null,
+
+    val userId: String,
+
+    val status: ReservationStatus,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val createdAt: LocalDateTime?,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val updatedAt: LocalDateTime?,
+
+    val lecture: LectureOnlyResponse,
+)
+
+fun Reservation.toDetailResponse() = ReservationDetailResponse(
+    id = id !!,
+    userId = userId,
+    status = status,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    lecture = lecture.toResponseLectureOnly(),
 )

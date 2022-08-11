@@ -10,4 +10,5 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
     fun existsByLectureIdAndUserId(lectureId: Long, userId: String): Boolean
 
     fun findByUserId(userId: String): List<Reservation>?
+    fun existsByUserId(userId: String): Boolean
 }
