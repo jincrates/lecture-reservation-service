@@ -30,6 +30,8 @@ class ReservationService(
             throw BadRequestException("이미 강연을 신청하셨습니다.")
         }
 
+        //TODO: lecture.reservations.size가 아니라 approval 상태의 reservaiotns 카운트를 가져와야한다.
+        //강연신청시 자동으로 승인되며, 예약 마감인원을 넘어갔을 경우 대기상태로 등록된다.
         val status = if (lecture.reservations.size < lecture.limitOfReservations) {
             ReservationStatus.APPROVAL
         } else {
@@ -101,6 +103,7 @@ class ReservationService(
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         reservationRepository.findByIdOrNull(reservationId)?.let { reservation ->
             lecture.reservations.remove(reservation)
+            reservationRepository.delete(reservation)
         }
     }
 

@@ -29,6 +29,8 @@ class LectureController(
         webDataBinder.addValidators(lectureValidator)
     }
 
+    //TODO: 중복강의 등록 불가 - 동일 시간에 동일 강의실 강연이 있는경우
+    //TODO: 강연장 수용인원보다 예약마감인원은 작아야한다.
     @PostMapping()
     fun createLecture(
         authUser: AuthUser,

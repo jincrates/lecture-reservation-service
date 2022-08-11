@@ -3,6 +3,7 @@ package me.jincrates.lecturereservationservice.service
 import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.LectureRepository
 import me.jincrates.lecturereservationservice.domain.RoomRepository
+import me.jincrates.lecturereservationservice.exception.BadRequestException
 import me.jincrates.lecturereservationservice.exception.NotFoundException
 import me.jincrates.lecturereservationservice.model.LectureRequest
 import me.jincrates.lecturereservationservice.model.LectureResponse
@@ -22,6 +23,14 @@ class LectureService(
     @Transactional
     fun createLecture(roomId: Long, createdBy: String, request: LectureRequest): LectureResponse {
         val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+
+        if (room.limitOfPersons < request.limitOfReservations) {
+            throw BadRequestException("예약 마감인원은 강연장 수용인원보다 클 수 없습니다.")
+        }
+
+        if (lectureRepository.existsByRoomIdAndOpenedAtBetween(roomId, request.openedAt, request.closedAt)) {
+            throw BadRequestException("해당 시간에 이미 신청된 강의가 존재합니다.")
+        }
 
         val lecture = Lecture(
             room = room,
@@ -52,6 +61,7 @@ class LectureService(
 
     /**
      * 강연 수정
+     * TODO: 강연의 마감인원은 현재 신청인원보다 작을 수 없다.
      */
     @Transactional
     fun updateLecture(lectureId: Long, request: LectureRequest): LectureResponse {
@@ -72,6 +82,7 @@ class LectureService(
         val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         lectureRepository.findByIdOrNull(lectureId)?.let { lecture ->
             room.lectures.remove(lecture)
+            lectureRepository.delete(lecture)
         }
     }
 }
