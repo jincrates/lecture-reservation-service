@@ -1,12 +1,16 @@
 package me.jincrates.lecturereservationservice.service
 
+import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.RoomRepository
 import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
+import me.jincrates.lecturereservationservice.exception.BadRequestException
 import me.jincrates.lecturereservationservice.exception.NotFoundException
 import me.jincrates.lecturereservationservice.model.RoomRequest
 import me.jincrates.lecturereservationservice.model.RoomResponse
 import me.jincrates.lecturereservationservice.model.toResponse
+import mu.KLogger
+import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class RoomService(
     private val roomRepository: RoomRepository,
+    private val logger: KLogger = KotlinLogging.logger {},
 ) {
 
     /**
@@ -24,7 +29,7 @@ class RoomService(
         val room = Room(
             title = request.title,
             limitOfPersons = request.limitOfPersons,
-            status = request.status,
+            status = CommonStatus(request.status!!),
             createdBy = createdBy,
         )
         return roomRepository.save(room).toResponse()
@@ -52,10 +57,18 @@ class RoomService(
     @Transactional
     fun updateRoom(id: Long, request: RoomRequest): RoomResponse? {
         val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+
+        //강연장 수용인원
+        room.lectures.forEach {
+            if (it.limitOfReservations > request.limitOfPersons) {
+                throw BadRequestException("강연장 수용인원은 강연의 예약마감인원보다 커야합니다.")
+            }
+        }
+
         return with(room) {
-            title = request.title
-            limitOfPersons = request.limitOfPersons
-            status = request.status
+            this.title = request.title
+            this.limitOfPersons = request.limitOfPersons
+            this.status = CommonStatus(request.status!!)
             roomRepository.save(this).toResponse()
         }
     }
@@ -66,8 +79,10 @@ class RoomService(
     @Transactional
     fun updateRoomStatus(id: Long, status: String): RoomResponse {
         val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
-        room.status = CommonStatus(status)
-        return roomRepository.save(room).toResponse()
+        return with(room) {
+            this.status = CommonStatus(status)
+            roomRepository.save(this).toResponse()
+        }
     }
 
     /**

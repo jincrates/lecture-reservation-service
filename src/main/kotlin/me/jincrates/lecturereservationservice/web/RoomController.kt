@@ -41,6 +41,7 @@ class RoomController(
         @PathVariable id: Long,
     ) = roomService.getRoom(id)
 
+    //TODO: 강연장 인원 수정시 강연의 마감인원 보다 적게 수정할 수 없다.
     @PutMapping("/{id}")
     fun updateRoom(
         authUser: AuthUser,

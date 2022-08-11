@@ -21,7 +21,7 @@ data class RoomRequest(
     @field: Min(value = 1, message = "강연장 수용인원은 1명 이상입니다.")
     val limitOfPersons: Int,
 
-    val status: CommonStatus,
+    val status: String? = CommonStatus("ACTIVE").toString(),
 )
 
 /**
