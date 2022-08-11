@@ -93,13 +93,11 @@ class LectureControllerTest {
             openedAt = LocalDateTime.now().plusDays(1),
             closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
-
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 제목을 입력하지 않았습니다."))
             .andDo(MockMvcResultHandlers.print())
 
@@ -121,13 +119,11 @@ class LectureControllerTest {
             openedAt = "2022-08-10T09:00:00" as LocalDateTime,
             closedAt = "2022-08-10T12:00:00" as LocalDateTime,
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
-
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 제목은 50자까지만 입력할 수 있습니다."))
             .andDo(MockMvcResultHandlers.print())
 
@@ -149,13 +145,11 @@ class LectureControllerTest {
             openedAt = "2022-08-10T09:00:00" as LocalDateTime,
             closedAt = "2022-08-10T12:00:00" as LocalDateTime,
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
-
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 상세내용을 입력하지 않았습니다."))
             .andDo(MockMvcResultHandlers.print())
 
@@ -183,7 +177,7 @@ class LectureControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연자명을 입력하지 않았습니다."))
             .andDo(MockMvcResultHandlers.print())
 
@@ -211,7 +205,7 @@ class LectureControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
             .andDo(MockMvcResultHandlers.print())
 
@@ -239,7 +233,7 @@ class LectureControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
             .andDo(MockMvcResultHandlers.print())
 
