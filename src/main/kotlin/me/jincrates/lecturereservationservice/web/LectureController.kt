@@ -1,15 +1,12 @@
 package me.jincrates.lecturereservationservice.web
 
 import me.jincrates.lecturereservationservice.config.AuthUser
-import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.validator.LectureValidator
 import me.jincrates.lecturereservationservice.model.LectureRequest
-import me.jincrates.lecturereservationservice.model.LectureResponse
 import me.jincrates.lecturereservationservice.service.LectureService
 import mu.KLogger
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
-import org.springframework.validation.Errors
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -50,6 +47,13 @@ class LectureController(
         @PathVariable roomId: Long,
         @PathVariable lectureId: Long,
     ) = lectureService.getLecture(roomId, lectureId)
+
+    @GetMapping("/{lectureId}/users")
+    fun getLectureUsers(
+        authUser: AuthUser,
+        @PathVariable roomId: Long,
+        @PathVariable lectureId: Long,
+    ) = lectureService.getLectureUsers(roomId, lectureId)
 
     @PutMapping("/{lectureId}")
     fun updateLecture(

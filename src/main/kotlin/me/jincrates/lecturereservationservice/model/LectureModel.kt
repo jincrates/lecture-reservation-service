@@ -1,12 +1,9 @@
 package me.jincrates.lecturereservationservice.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.Reservation
-import me.jincrates.lecturereservationservice.domain.annotation.StringFormatDateTime
 import org.hibernate.validator.constraints.Length
-import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
@@ -79,7 +76,6 @@ fun Lecture.toResponse() = LectureResponse(
     updatedAt = updatedAt,
 )
 
-
 data class LectureOnlyResponse(
 
     val id: Long? = null,
@@ -110,4 +106,50 @@ fun Lecture.toResponseLectureOnly() = LectureOnlyResponse(
     limitOfReservations = limitOfReservations,
     openedAt = openedAt,
     closedAt = closedAt,
+)
+
+data class LectureUsersResponse(
+
+    val id: Long? = null,
+
+    val roomId: Long,
+
+    val title: String,   //강연 제목
+
+    val description: String,  //강연 상세내용
+
+    val lecturerName: String,  //강연자명
+
+    val limitOfReservations: Int,  //예약(신청)마감인원
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val openedAt: LocalDateTime,   //강연시작일시
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val closedAt: LocalDateTime,   //강연종료일시
+
+    val users: List<String> = emptyList(),
+
+    val createdBy: String,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val createdAt: LocalDateTime?,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val updatedAt: LocalDateTime?,
+)
+
+fun Lecture.toResponseUsers() = LectureUsersResponse(
+    id = id!!,
+    roomId = room.id!!,
+    title = title,
+    description = description,
+    lecturerName = lecturerName,
+    limitOfReservations = limitOfReservations,
+    openedAt = openedAt,
+    closedAt = closedAt,
+    users = reservations.sortedBy(Reservation::userId).map(Reservation::userId),
+    createdBy = createdBy,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )

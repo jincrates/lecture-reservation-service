@@ -5,9 +5,7 @@ import me.jincrates.lecturereservationservice.domain.LectureRepository
 import me.jincrates.lecturereservationservice.domain.RoomRepository
 import me.jincrates.lecturereservationservice.exception.BadRequestException
 import me.jincrates.lecturereservationservice.exception.NotFoundException
-import me.jincrates.lecturereservationservice.model.LectureRequest
-import me.jincrates.lecturereservationservice.model.LectureResponse
-import me.jincrates.lecturereservationservice.model.toResponse
+import me.jincrates.lecturereservationservice.model.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -74,6 +72,14 @@ class LectureService(
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         return lecture.toResponse()
     }
+
+    @Transactional(readOnly = true)
+    fun getLectureUsers(roomId: Long, lectureId: Long): LectureUsersResponse {
+        roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        return lecture.toResponseUsers()
+    }
+
 
     /**
      * 강연 수정
