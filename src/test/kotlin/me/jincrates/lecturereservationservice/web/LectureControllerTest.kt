@@ -19,6 +19,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.transaction.annotation.Transactional
@@ -32,9 +33,9 @@ import java.time.format.DateTimeFormatter
 class LectureControllerTest {
 
     @Autowired lateinit var mockMvc: MockMvc
+    @Autowired lateinit var objectMapper: ObjectMapper
     @Autowired lateinit var lectureRepository: LectureRepository
     @Autowired lateinit var roomRepository: RoomRepository
-    @Autowired lateinit var objectMapper: ObjectMapper
 
     @Test
     @DisplayName("강연 등록 - 입력값 정상")
@@ -42,21 +43,10 @@ class LectureControllerTest {
         val newRoom = createRoom()
         assertNotNull(newRoom)
 
-        val lectureRequest = LectureRequest(
-            title = "강연 제목입니다.",
-            description = "강연 상세내용입니다.",
-            lecturerName = "강연자",
-            limitOfReservations = 1,
-            openedAt = LocalDateTime.now().plusDays(1),
-            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
-        )
-        println(lectureRequest)
-        val json = objectMapper.writeValueAsString(lectureRequest)
-
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
+        val lectureRequest = createLectureRequest()
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.title").value(lectureRequest.title))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.description").value(lectureRequest.description))
@@ -99,16 +89,15 @@ class LectureControllerTest {
             title = "",
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
-            limitOfReservations = 0,
-            openedAt = "2022-08-10T09:00:00" as LocalDateTime,
-            closedAt = "2022-08-10T12:00:00" as LocalDateTime,
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 제목을 입력하지 않았습니다."))
@@ -134,10 +123,9 @@ class LectureControllerTest {
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 제목은 50자까지만 입력할 수 있습니다."))
@@ -163,10 +151,9 @@ class LectureControllerTest {
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 상세내용을 입력하지 않았습니다."))
@@ -192,10 +179,9 @@ class LectureControllerTest {
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연자명을 입력하지 않았습니다."))
@@ -221,10 +207,9 @@ class LectureControllerTest {
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
@@ -250,10 +235,9 @@ class LectureControllerTest {
         )
         val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("\$.code").value(500))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
@@ -274,5 +258,16 @@ class LectureControllerTest {
             createdBy = "94042",
         )
         return roomRepository.save(room)
+    }
+
+    private fun createLectureRequest(): LectureRequest {
+        return LectureRequest(
+            title = "강연 제목입니다.",
+            description = "강연 상세내용입니다.",
+            lecturerName = "강연자",
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
+        )
     }
 }
