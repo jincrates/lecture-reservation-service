@@ -10,6 +10,7 @@ import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import me.jincrates.lecturereservationservice.model.LectureRequest
 import me.jincrates.lecturereservationservice.model.RoomRequest
 import me.jincrates.lecturereservationservice.service.LectureService
+import me.jincrates.lecturereservationservice.service.RoomService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -43,12 +44,7 @@ class RoomControllerTest {
     @Autowired lateinit var roomRepository: RoomRepository
     @Autowired lateinit var lectureService: LectureService
 
-    @BeforeEach
-    fun beforeEach() {
-        createRooms()  //강연장 15개를 생성
-    }
-
-    @AfterEach()
+    @AfterEach
     fun afterEach() {
         roomRepository.deleteAll()
     }
@@ -125,7 +121,7 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("강연장 등록 - 입력값 오류3 - 강연장 수용인원 0명")
+    @DisplayName("강연장 등록 - 입력값 오류3 - 강연장 수용인원이 1보다 작은 경우")
     fun createRoomFailTest3() {
         val roomRequest = RoomRequest(
             title = "테스트 강연장",
@@ -148,6 +144,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 전체 조회 - 기본값(ACTIVE)")
     fun getAllRoom() {
+        createRooms()
+
         val rooms = roomRepository.findAllByStatusOrderByCreatedAtDesc(CommonStatus.ACTIVE)
         assertNotNull(rooms)
         assertEquals(10, rooms!!.size)
@@ -160,6 +158,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 전체 조회 - INACTIVE")
     fun getAllRoomInactive() {
+        createRooms()
+
         val rooms = roomRepository.findAllByStatusOrderByCreatedAtDesc(CommonStatus.INACTIVE)
         assertNotNull(rooms)
         assertEquals(5, rooms!!.size)
@@ -175,6 +175,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 상세 조회")
     fun getRoom() {
+        createRooms()
+
         val roomId: Long = 12
         val room = roomRepository.findById(roomId)
         assertNotNull(room)
@@ -187,7 +189,11 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 수정 - 입력값 정상")
     fun editRoomSuccess() {
+        createRooms()
+
         val roomId: Long = 1
+        assertTrue(roomRepository.existsById(roomId))
+
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
             limitOfPersons = 30,
@@ -212,6 +218,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 수정 - 입력값 오류1 - id 없음")
     fun editRoomFail1() {
+        createRooms()
+
         val roomId: Long = 99
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
@@ -230,6 +238,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 수정 - 입력값 오류2 - 강연장 수용인원은 강연의 예약마감인원보다 커야한다.")
     fun editRoomFail2() {
+        createRooms()
+
         val roomId: Long = 2
         val room = roomRepository.findByIdOrNull(roomId)
         assertNotNull(room)
@@ -263,6 +273,8 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 삭제")
     fun deleteRoom() {
+        createRooms()
+
         val roomId: Long = 10
         mockMvc.perform(delete("/api/v1/admin/rooms/$roomId")
             .contentType(MediaType.APPLICATION_JSON))

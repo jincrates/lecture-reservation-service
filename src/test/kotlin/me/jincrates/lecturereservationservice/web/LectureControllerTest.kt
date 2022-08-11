@@ -1,25 +1,23 @@
 package me.jincrates.lecturereservationservice.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.LectureRepository
 import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.RoomRepository
 import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import me.jincrates.lecturereservationservice.model.LectureRequest
-import me.jincrates.lecturereservationservice.model.toResponse
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.transaction.annotation.Transactional
@@ -71,13 +69,6 @@ class LectureControllerTest {
             lecture?.closedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         )
     }
-
-    //강연 제목을 입력하지 않았습니다.
-    //강연 제목은 50자까지만 입력할 수 있습니다.
-    //강연 상세내용을 입력하지 않았습니다.
-    //강연자명을 입력하지 않았습니다.
-    //강연 시작일자 yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.
-    //강연 종료일자 yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.
 
     @Test
     @DisplayName("강연 등록 - 입력값 오류1 - 강연 제목 입력하지 않음")
@@ -185,7 +176,7 @@ class LectureControllerTest {
     }
 
     @Test
-    @DisplayName("강연 등록 - 입력값 오류5 - 강연 예약마감인원을 1보다 작은 경우")
+    @DisplayName("강연 등록 - 입력값 오류5 - 강연 예약마감인원이 1보다 작은 경우")
     fun createLectureFailTest5() {
         val newRoom = createRoom()
         assertNotNull(newRoom)
@@ -265,6 +256,96 @@ class LectureControllerTest {
         assertNull(lecture)
     }
 
+    @Test
+    @DisplayName("강연 수정 - 입력값 정상")
+    fun updateLectureSuccessTest() {
+        val room = createRoom()
+        assertNotNull(room)
+
+        val newLecture = createLecture(room)
+        assertNotNull(newLecture)
+
+        val updateLectureRequest = LectureRequest(
+            title = "강연 제목입니다. - 수정",
+            description = "강연 상세내용입니다. - 수정",
+            lecturerName = "강연자 - 수정",
+            limitOfReservations = 21,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
+        )
+
+        mockMvc.perform(put("/api/v1/rooms/${room.id}/lectures/${newLecture.id}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateLectureRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.title").value(updateLectureRequest.title))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.description").value(updateLectureRequest.description))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.lecturerName").value(updateLectureRequest.lecturerName))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.limitOfReservations").value(updateLectureRequest.limitOfReservations))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.openedAt").value(updateLectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.closedAt").value(updateLectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            .andDo(MockMvcResultHandlers.print())
+
+        val lecture = lectureRepository.findByTitle(updateLectureRequest.title)
+        assertNotNull(lecture)
+        assertEquals(updateLectureRequest.title, lecture?.title)
+        assertEquals(updateLectureRequest.description, lecture?.description)
+        assertEquals(updateLectureRequest.lecturerName, lecture?.lecturerName)
+        assertEquals(updateLectureRequest.limitOfReservations, lecture?.limitOfReservations)
+        assertEquals(
+            updateLectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.openedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
+        assertEquals(
+            updateLectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.closedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
+    }
+
+    @Test
+    @DisplayName("강연 수정 - 입력값 오류1 - 강연 마감인원은 현재 신청인원보다 커야한다.")
+    fun updateLectureFailTest1() {
+        val room = createRoom()
+        val newLecture = createLecture(room)
+
+        val updateLectureRequest = LectureRequest(
+            title = "강연 제목입니다. - 수정",
+            description = "강연 상세내용입니다. - 수정",
+            lecturerName = "강연자 - 수정",
+            limitOfReservations = 21,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
+        )
+
+        mockMvc.perform(put("/api/v1/rooms/${room.id}/lectures/${newLecture.id}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateLectureRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.title").value(updateLectureRequest.title))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.description").value(updateLectureRequest.description))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.lecturerName").value(updateLectureRequest.lecturerName))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.limitOfReservations").value(updateLectureRequest.limitOfReservations))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.openedAt").value(updateLectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.closedAt").value(updateLectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            .andDo(MockMvcResultHandlers.print())
+
+        val lecture = lectureRepository.findByTitle(updateLectureRequest.title)
+        assertNotNull(lecture)
+        assertEquals(updateLectureRequest.title, lecture?.title)
+        assertEquals(updateLectureRequest.description, lecture?.description)
+        assertEquals(updateLectureRequest.lecturerName, lecture?.lecturerName)
+        assertEquals(updateLectureRequest.limitOfReservations, lecture?.limitOfReservations)
+        assertEquals(
+            updateLectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.openedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
+        assertEquals(
+            updateLectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.closedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
+    }
+
+
     private fun createRoom(): Room {
         val room = Room(
             title = "테스트 강연장",
@@ -273,6 +354,20 @@ class LectureControllerTest {
             createdBy = "94042",
         )
         return roomRepository.save(room)
+    }
+
+    private fun createLecture(room: Room): Lecture {
+        val lecture = Lecture(
+            room = room,
+            title = "강연 제목입니다.",
+            description = "강연 상세내용입니다.",
+            lecturerName = "강연자",
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
+            createdBy = "94042"
+        )
+        return lectureRepository.save(lecture)
     }
 
     private fun createLectureRequest(): LectureRequest {
