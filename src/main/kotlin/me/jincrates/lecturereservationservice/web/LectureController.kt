@@ -25,7 +25,7 @@ class LectureController(
     //지정한 객체로 요청이 들어올 경우 lectureValidator를 우선 실행
     @InitBinder("lectureRequest")
     fun initBinder(webDataBinder: WebDataBinder) {
-        //logger.info{ "webDataBinder=" + webDataBinder + ", target=" + webDataBinder.target }
+        logger.info{ "webDataBinder=" + webDataBinder + ", target=" + webDataBinder.target }
         webDataBinder.addValidators(lectureValidator)
     }
 

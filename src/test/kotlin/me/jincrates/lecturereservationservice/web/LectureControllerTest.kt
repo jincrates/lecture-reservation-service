@@ -115,9 +115,9 @@ class LectureControllerTest {
             title = "이름과, 무엇인지 하나에 나는 강아지, 하늘에는 흙으로 가득 차 버리었습니다. 말 새워 이국 잔디가 밤을 아직 덮어 하늘에는 않은 봅니다. 보고, 못 써 이네들은 지나가는 계십니다. 피어나듯이 새워 둘 까닭입니다. 아무 밤을 이런 당신은 노새, 잠, 청춘이 봅니다. 내 북간도에 별 흙으로 하나에 덮어 있습니다. 덮어 나의 당신은 별 까닭입니다. 차 가을로 어머니, 마리아 경, 그리워 봅니다. 새겨지는 없이 한 다 어머님, 사람들의 봅니다.",
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
-            limitOfReservations = 0,
-            openedAt = "2022-08-10T09:00:00" as LocalDateTime,
-            closedAt = "2022-08-10T12:00:00" as LocalDateTime,
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
@@ -141,9 +141,9 @@ class LectureControllerTest {
             title = "강연 제목입니다.",
             description = "",
             lecturerName = "강연자",
-            limitOfReservations = 0,
-            openedAt = "2022-08-10T09:00:00" as LocalDateTime,
-            closedAt = "2022-08-10T12:00:00" as LocalDateTime,
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
@@ -167,11 +167,10 @@ class LectureControllerTest {
             title = "강연 제목입니다.",
             description = "강연 상세내용입니다.",
             lecturerName = "",
-            limitOfReservations = 0,
-            openedAt = "2022-08-10T09:00:00" as LocalDateTime,
-            closedAt = "2022-08-10T12:00:00" as LocalDateTime,
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +185,7 @@ class LectureControllerTest {
     }
 
     @Test
-    @DisplayName("강연 등록 - 입력값 오류5 - 강연 시작일자 포맷이 맞지 않음")
+    @DisplayName("강연 등록 - 입력값 오류5 - 강연 예약마감인원을 1보다 작은 경우")
     fun createLectureFailTest5() {
         val newRoom = createRoom()
         assertNotNull(newRoom)
@@ -196,17 +195,16 @@ class LectureControllerTest {
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
             limitOfReservations = 0,
-            openedAt = "2022-08-10" as LocalDateTime,
-            closedAt = "2022-08-10T12:00:00" as LocalDateTime,
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("예약 마감인원은 1명 이상이여야 합니다."))
             .andDo(MockMvcResultHandlers.print())
 
         val lecture = lectureRepository.findByTitle(lectureRequest.title)
@@ -214,7 +212,7 @@ class LectureControllerTest {
     }
 
     @Test
-    @DisplayName("강연 등록 - 입력값 오류6 - 강연 종료일자 포맷이 맞지 않음")
+    @DisplayName("강연 등록 - 입력값 오류6 - 강연 시작일자가 등록일자보다 이전인 경우")
     fun createLectureFailTest6() {
         val newRoom = createRoom()
         assertNotNull(newRoom)
@@ -223,26 +221,49 @@ class LectureControllerTest {
             title = "강연 제목입니다.",
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
-            limitOfReservations = 0,
-            openedAt = "2022-08-10T09:00:00" as LocalDateTime,
-            closedAt = "2022-08-10" as LocalDateTime,
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().minusHours(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
 
         mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(lectureRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 시작일시를 정확히 입력하세요."))
             .andDo(MockMvcResultHandlers.print())
 
         val lecture = lectureRepository.findByTitle(lectureRequest.title)
         assertNull(lecture)
     }
 
-    //TODO: 강연시작일자와 강연종료일자를 비교하는 로직 필요
+    @Test
+    @DisplayName("강연 등록 - 입력값 오류7 - 강연 종료일자가 시작일자보다 이전인 경우")
+    fun createLectureFailTest7() {
+        val newRoom = createRoom()
+        assertNotNull(newRoom)
 
+        val lectureRequest = LectureRequest(
+            title = "강연 제목입니다.",
+            description = "강연 상세내용입니다.",
+            lecturerName = "강연자",
+            limitOfReservations = 20,
+            openedAt = LocalDateTime.now().plusDays(1).plusHours(2),
+            closedAt = LocalDateTime.now().plusDays(1),
+        )
+
+        mockMvc.perform(post("/api/v1/rooms/${newRoom.id}/lectures")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(lectureRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.message").value("강연 종료일시를 정확히 입력하세요."))
+            .andDo(MockMvcResultHandlers.print())
+
+        val lecture = lectureRepository.findByTitle(lectureRequest.title)
+        assertNull(lecture)
+    }
 
     private fun createRoom(): Room {
         val room = Room(
