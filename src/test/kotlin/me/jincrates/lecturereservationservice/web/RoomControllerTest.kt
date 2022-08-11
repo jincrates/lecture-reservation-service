@@ -1,5 +1,6 @@
 package me.jincrates.lecturereservationservice.web
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import me.jincrates.lecturereservationservice.domain.Lecture
 import me.jincrates.lecturereservationservice.domain.LectureRepository
@@ -38,8 +39,8 @@ import java.time.format.DateTimeFormatter
 class RoomControllerTest {
 
     @Autowired lateinit var mockMvc: MockMvc
+    @Autowired lateinit var objectMapper: ObjectMapper
     @Autowired lateinit var roomRepository: RoomRepository
-    @Autowired lateinit var lectureRepository: LectureRepository
     @Autowired lateinit var lectureService: LectureService
 
     @BeforeEach
@@ -60,10 +61,10 @@ class RoomControllerTest {
             limitOfPersons = 20,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
+
         mockMvc.perform(post("/api/v1/admin/rooms")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("\$.title").value(roomRequest.title))
             .andExpect(jsonPath("\$.limitOfPersons").value(roomRequest.limitOfPersons))
@@ -89,11 +90,10 @@ class RoomControllerTest {
             limitOfPersons = 20,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
 
         mockMvc.perform(post("/api/v1/admin/rooms")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.code").value(400))
             .andExpect(jsonPath("\$.message").value("강연장명을 입력하지 않았습니다."))
@@ -111,11 +111,10 @@ class RoomControllerTest {
             limitOfPersons = 20,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
 
         mockMvc.perform(post("/api/v1/admin/rooms")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("\$.code").value(400))
             .andExpect(jsonPath("\$.message").value("강연장명은 50자까지만 입력할 수 있습니다."))
@@ -133,11 +132,10 @@ class RoomControllerTest {
             limitOfPersons = 0,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
 
         mockMvc.perform(post("/api/v1/admin/rooms")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.code").value(400))
             .andExpect(jsonPath("\$.message").value("강연장 수용인원은 1명 이상입니다."))
@@ -195,11 +193,9 @@ class RoomControllerTest {
             limitOfPersons = 30,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
-        println(json)
         mockMvc.perform(put("/api/v1/admin/rooms/$roomId")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("\$.title").value(roomRequest.title))
             .andExpect(jsonPath("\$.limitOfPersons").value(roomRequest.limitOfPersons))
@@ -207,7 +203,6 @@ class RoomControllerTest {
             .andDo(print())
 
         val room = roomRepository.findByTitle(roomRequest.title)
-
         assertNotNull(room)
         assertEquals(roomRequest.title, room?.title)
         assertEquals(roomRequest.limitOfPersons, room?.limitOfPersons)
@@ -223,10 +218,9 @@ class RoomControllerTest {
             limitOfPersons = 30,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
         mockMvc.perform(put("/api/v1/admin/rooms/$roomId")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("\$.code").value(404))
             .andExpect(jsonPath("\$.message").value("강연장이 존재하지 않습니다."))
@@ -234,7 +228,7 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("강연장 수정 - 입력값 오류2 - 이미 신청한 강연의 마감인원보다 강연장 수용인원을 적게 수정할 수 없다.")
+    @DisplayName("강연장 수정 - 입력값 오류2 - 강연장 수용인원은 강연의 예약마감인원보다 커야한다.")
     fun editRoomFail2() {
         val roomId: Long = 2
         val room = roomRepository.findByIdOrNull(roomId)
@@ -257,10 +251,9 @@ class RoomControllerTest {
             limitOfPersons = limitOfReservationsDown,
             status = CommonStatus("ACTIVE").toString(),
         )
-        val json = jacksonObjectMapper().writeValueAsString(roomRequest)
         mockMvc.perform(put("/api/v1/admin/rooms/$roomId")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+            .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
             .andExpect(jsonPath("\$.code").value(400))
             .andExpect(jsonPath("\$.message").value("강연장 수용인원은 강연의 예약마감인원보다 커야합니다."))

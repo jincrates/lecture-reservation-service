@@ -26,11 +26,9 @@ data class LectureRequest(
     @field: Min(value = 1, message = "예약 마감인원은 1명 이상이여야 합니다.")
     val limitOfReservations: Int,
 
-    //@field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
     @field: JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val openedAt: LocalDateTime,
 
-    //@field: StringFormatDateTime(pattern = "yyyy-MM-dd HH:mm:ss", message = "yyyy-MM-dd HH:mm:ss 포맷이 맞지 않습니다.")
     @field: JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     val closedAt: LocalDateTime,
 )
