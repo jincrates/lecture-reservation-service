@@ -1,11 +1,13 @@
 package me.jincrates.lecturereservationservice.web
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import me.jincrates.lecturereservationservice.domain.LectureRepository
 import me.jincrates.lecturereservationservice.domain.Room
 import me.jincrates.lecturereservationservice.domain.RoomRepository
 import me.jincrates.lecturereservationservice.domain.enums.CommonStatus
 import me.jincrates.lecturereservationservice.model.LectureRequest
+import me.jincrates.lecturereservationservice.model.toResponse
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
@@ -25,21 +28,18 @@ import java.time.format.DateTimeFormatter
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = ["spring.config.location=classpath:application-dev.yml"])
 class LectureControllerTest {
 
     @Autowired lateinit var mockMvc: MockMvc
     @Autowired lateinit var lectureRepository: LectureRepository
     @Autowired lateinit var roomRepository: RoomRepository
+    @Autowired lateinit var objectMapper: ObjectMapper
 
     @Test
-    @DisplayName("강연 등록 - 입력값 정상(openedAt, closedAt 확인 필요)")
+    @DisplayName("강연 등록 - 입력값 정상")
     fun createLectureSuccessTest() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -47,18 +47,12 @@ class LectureControllerTest {
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
             limitOfReservations = 1,
-            openedAt = LocalDateTime.parse("2022-08-10 09:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-            closedAt = LocalDateTime.parse("2022-08-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            openedAt = LocalDateTime.now().plusDays(1),
+            closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        //val json = jacksonObjectMapper().writeValueAsString(lectureRequest)
-        val json = "{\n" +
-                "    \"title\": \"강연 제목입니다.\",\n" +
-                "    \"description\": \"강연 상세내용입니다.\",\n" +
-                "    \"lecturerName\": \"강연자\",\n" +
-                "    \"limitOfReservations\": 1,\n" +
-                "    \"openedAt\": \"2022-08-10 09:00:00\",\n" +
-                "    \"closedAt\": \"2022-08-10 12:00:00\"\n" +
-                "}";
+        println(lectureRequest)
+        val json = objectMapper.writeValueAsString(lectureRequest)
+
         mockMvc.perform(
             MockMvcRequestBuilders.post("/api/v1/rooms/${newRoom.id}/lectures")
             .contentType(MediaType.APPLICATION_JSON)
@@ -68,19 +62,24 @@ class LectureControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("\$.description").value(lectureRequest.description))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.lecturerName").value(lectureRequest.lecturerName))
             .andExpect(MockMvcResultMatchers.jsonPath("\$.limitOfReservations").value(lectureRequest.limitOfReservations))
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.openedAt").value(lectureRequest.openedAt))
-            .andExpect(MockMvcResultMatchers.jsonPath("\$.closedAt").value(lectureRequest.closedAt))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.openedAt").value(lectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("\$.closedAt").value(lectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
             .andDo(MockMvcResultHandlers.print())
 
         val lecture = lectureRepository.findByTitle(lectureRequest.title)
-
         assertNotNull(lecture)
         assertEquals(lectureRequest.title, lecture?.title)
         assertEquals(lectureRequest.description, lecture?.description)
         assertEquals(lectureRequest.lecturerName, lecture?.lecturerName)
         assertEquals(lectureRequest.limitOfReservations, lecture?.limitOfReservations)
-        //assertEquals(lectureRequest.openedAt, lecture?.openedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-        //assertEquals(lectureRequest.closedAt, lecture?.closedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+        assertEquals(
+            lectureRequest.openedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.openedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
+        assertEquals(
+            lectureRequest.closedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            lecture?.closedAt?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        )
     }
 
     //강연 제목을 입력하지 않았습니다.
@@ -93,12 +92,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류1 - 강연 제목 입력하지 않음")
     fun createLectureFailTest1() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -127,12 +121,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류2 - 강연 제목 50자 초과")
     fun createLectureFailTest2() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -161,12 +150,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류3 - 강연 상세내용 입력하지 않음")
     fun createLectureFailTest3() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -195,12 +179,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류4 - 강연자명 입력하지 않음")
     fun createLectureFailTest4() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -229,12 +208,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류5 - 강연 시작일자 포맷이 맞지 않음")
     fun createLectureFailTest5() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -263,12 +237,7 @@ class LectureControllerTest {
     @Test
     @DisplayName("강연 등록 - 입력값 오류6 - 강연 종료일자 포맷이 맞지 않음")
     fun createLectureFailTest6() {
-        val room = Room(
-            title = "테스트 강연장",
-            limitOfPersons = 20,
-            status = CommonStatus.ACTIVE,
-        )
-        val newRoom = roomRepository.save(room)
+        val newRoom = createRoom()
         assertNotNull(newRoom)
 
         val lectureRequest = LectureRequest(
@@ -295,4 +264,15 @@ class LectureControllerTest {
     }
 
     //TODO: 강연시작일자와 강연종료일자를 비교하는 로직 필요
+
+
+    private fun createRoom(): Room {
+        val room = Room(
+            title = "테스트 강연장",
+            limitOfPersons = 20,
+            status = CommonStatus.ACTIVE,
+            createdBy = "94042",
+        )
+        return roomRepository.save(room)
+    }
 }
