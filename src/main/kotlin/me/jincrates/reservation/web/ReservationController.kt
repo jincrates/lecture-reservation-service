@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
-@Api(description = "예약 관리")
+@Api(tags = ["03. 예약 관리"], description = "ReservationController CRUD 구현")
 @RestController
 @RequestMapping("/api/v1/lectures/{lectureId}/reservations")
 class ReservationController(
@@ -19,7 +19,7 @@ class ReservationController(
 ) {
 
     @ApiOperation(value = "예약 등록", notes = "ReservationRequest를 통해 예약을 등록합니다.")
-    @ApiImplicitParam(name = "lectureId", value = "강연 ID", dataType = "integer")
+    @ApiImplicitParam(name = "lectureId", value = "강연 ID")
     @PostMapping()
     fun createReservation(
         authUser: AuthUser,
@@ -28,7 +28,7 @@ class ReservationController(
     ) = reservationService.createReservation(lectureId, request)
 
     @ApiOperation(value = "예약 상세 조회", notes = "예약의 ID를 통해 예약의 상세 정보를 조회합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     @GetMapping("/{reservationId}")
     fun getReservation(
         authUser: AuthUser,
@@ -36,7 +36,7 @@ class ReservationController(
     ) = reservationService.getReservationById(reservationId)
 
     @ApiOperation(value = "예약 조회(신청자 사번으로 조회)", notes = "신청자 사번을 통해 예약 정보를 조회합니다.")
-    @ApiImplicitParam(name = "userId", value = "신청자 사번", dataType = "string")
+    @ApiImplicitParam(name = "userId", value = "신청자 사번")
     @GetMapping("/{reservationId}/users/{userId}")
     fun getReservationByUserId(
         authUser: AuthUser,
@@ -44,7 +44,7 @@ class ReservationController(
     ) = reservationService.getReservationByUserId(userId)
 
     @ApiOperation(value = "예약 수정", notes = "예약의 정보를 수정합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     @PutMapping("/{reservationId}")
     fun updateReservation(
         authUser: AuthUser,
@@ -53,7 +53,7 @@ class ReservationController(
     ) = reservationService.updateReservation(reservationId, request)
 
     @ApiOperation(value = "예약 승인", notes = "예약의 상태를 승인으로 수정합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     @PutMapping("/{reservationId}/approval")
     fun updateStatusToApproval(
         authUser: AuthUser,
@@ -63,7 +63,7 @@ class ReservationController(
 
     @PutMapping("/{reservationId}/waiting")
     @ApiOperation(value = "예약 대기", notes = "예약의 상태를 대기로 수정합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     fun updateStatusToWaiting(
         authUser: AuthUser,
         @PathVariable reservationId: Long,
@@ -71,7 +71,7 @@ class ReservationController(
     ) = reservationService.updateStatusToWaiting(reservationId, request)
 
     @ApiOperation(value = "예약 취소", notes = "예약의 상태를 취소로 수정합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     @PutMapping("/{reservationId}/cancel")
     fun updateStatusToCancel(
         authUser: AuthUser,
@@ -80,7 +80,7 @@ class ReservationController(
     ) = reservationService.updateStatusToCancel(reservationId, request)
 
     @ApiOperation(value = "예약 삭제", notes = "예약의 ID를 통해 예약 정보를 삭제합니다.")
-    @ApiImplicitParam(name = "reservationId", value = "예약 ID", dataType = "integer")
+    @ApiImplicitParam(name = "reservationId", value = "예약 ID")
     @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReservation(

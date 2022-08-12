@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
-@Api(description = "강연장 관리")
+@Api(tags = ["01. 강연장 관리"], description = "RoomController CRUD 구현")
 @RestController
 @RequestMapping("/api/v1/admin/rooms")  //TODO: 어드민(BackOffice) 권한 가진자만 가능해야할 것으로 보임
 class RoomController(
@@ -31,12 +31,12 @@ class RoomController(
     @ApiOperation(value = "강연장 등록", notes = "RoomRequest를 통해 강연장을 등록합니다.")
     @PostMapping()
     fun createRoom(
-        authUser: AuthUser, // memberId: Long,  // TODO: 사용자 인증처리가 필요하지 않을까
+        authUser: AuthUser,
         @Valid @RequestBody request: RoomRequest,
     ) = roomService.createRoom(authUser.authId, request)
 
     @ApiOperation(value = "강연장 전체 조회", notes = "강연장 전체 목록을 조회합니다.")
-    @ApiImplicitParam(name = "status", value = "강연장 상태", dataType = "string")
+    @ApiImplicitParam(name = "status", value = "강연장 상태")
     @GetMapping()
     fun getAll(
         authUser: AuthUser,
@@ -44,7 +44,7 @@ class RoomController(
     ) = roomService.getAll(status)
 
     @ApiOperation(value = "강연장 상세 조회", notes = "강연장의 ID를 통해 강연장의 상세 정보를 조회합니다.")
-    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID")
     @GetMapping("/{roomId}")
     fun getRoom(
         authUser: AuthUser,
@@ -53,7 +53,7 @@ class RoomController(
 
     //TODO: 강연장 인원 수정시 강연의 마감인원 보다 적게 수정할 수 없다.
     @ApiOperation(value = "강연장 수정", notes = "강연장의 정보를 수정합니다.")
-    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID")
     @PutMapping("/{roomId}")
     fun updateRoom(
         authUser: AuthUser,
@@ -63,8 +63,8 @@ class RoomController(
 
     @ApiOperation(value = "강연장 상태 수정", notes = "강연장의 상태값을 수정합니다.")
     @ApiImplicitParams(*[
-        ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer"),
-        ApiImplicitParam(name = "status", value = "강연장 상태", dataType = "string"),
+        ApiImplicitParam(name = "roomId", value = "강연장 ID"),
+        ApiImplicitParam(name = "status", value = "강연장 상태"),
     ])
     @PutMapping("/{roomId}/{status}")
     fun updateRoomStatus(
@@ -74,7 +74,7 @@ class RoomController(
     ) = roomService.updateRoomStatus(roomId, status)
 
     @ApiOperation(value = "강연장 삭제", notes = "강연장의 ID를 통해 강연장 정보를 삭제합니다.")
-    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID")
     @DeleteMapping("/{roomId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteRoom(

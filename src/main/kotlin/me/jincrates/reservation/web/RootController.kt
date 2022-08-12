@@ -6,11 +6,10 @@ import springfox.documentation.annotations.ApiIgnore
 
 @ApiIgnore
 @Controller
-@RequestMapping(value = ["/"])
 class RootController {
 
     @RequestMapping("/")
     fun homeRedirect(): String {
-        return "redirect:/swagger-ui.html"
+        return "redirect:/swagger-ui/"
     }
 }
