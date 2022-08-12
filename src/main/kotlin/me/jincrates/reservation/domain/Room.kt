@@ -1,5 +1,6 @@
 package me.jincrates.reservation.domain
 
+import io.swagger.annotations.ApiModelProperty
 import me.jincrates.reservation.domain.enums.CommonStatus
 import javax.persistence.*
 

@@ -1,5 +1,9 @@
 package me.jincrates.reservation.web
 
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiOperation
 import me.jincrates.reservation.config.AuthUser
 import me.jincrates.reservation.domain.enums.CommonStatus
 import me.jincrates.reservation.model.RoomRequest
@@ -17,49 +21,64 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
+@Api(description = "강연장 관리")
 @RestController
 @RequestMapping("/api/v1/admin/rooms")  //TODO: 어드민(BackOffice) 권한 가진자만 가능해야할 것으로 보임
 class RoomController(
     private val roomService: RoomService,
 ) {
 
+    @ApiOperation(value = "강연장 등록", notes = "RoomRequest를 통해 강연장을 등록합니다.")
     @PostMapping()
     fun createRoom(
         authUser: AuthUser, // memberId: Long,  // TODO: 사용자 인증처리가 필요하지 않을까
         @Valid @RequestBody request: RoomRequest,
-    ) = roomService.createRoom(authUser.userId, request)
+    ) = roomService.createRoom(authUser.authId, request)
 
+    @ApiOperation(value = "강연장 전체 조회", notes = "강연장 전체 목록을 조회합니다.")
+    @ApiImplicitParam(name = "status", value = "강연장 상태", dataType = "string")
     @GetMapping()
     fun getAll(
         authUser: AuthUser,
         @RequestParam(required = false, defaultValue = "ACTIVE") status: CommonStatus,
     ) = roomService.getAll(status)
 
-    @GetMapping("/{id}")
+    @ApiOperation(value = "강연장 상세 조회", notes = "강연장의 ID를 통해 강연장의 상세 정보를 조회합니다.")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @GetMapping("/{roomId}")
     fun getRoom(
         authUser: AuthUser,
-        @PathVariable id: Long,
-    ) = roomService.getRoom(id)
+        @PathVariable roomId: Long,
+    ) = roomService.getRoom(roomId)
 
     //TODO: 강연장 인원 수정시 강연의 마감인원 보다 적게 수정할 수 없다.
-    @PutMapping("/{id}")
+    @ApiOperation(value = "강연장 수정", notes = "강연장의 정보를 수정합니다.")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @PutMapping("/{roomId}")
     fun updateRoom(
         authUser: AuthUser,
-        @PathVariable id: Long,
+        @PathVariable roomId: Long,
         @Valid @RequestBody request: RoomRequest,
-    ) = roomService.updateRoom(id, request)
+    ) = roomService.updateRoom(roomId, request)
 
-    @PutMapping("/{id}/{status}")
+    @ApiOperation(value = "강연장 상태 수정", notes = "강연장의 상태값을 수정합니다.")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer"),
+        ApiImplicitParam(name = "status", value = "강연장 상태", dataType = "string"),
+    ])
+    @PutMapping("/{roomId}/{status}")
     fun updateRoomStatus(
         authUser: AuthUser,
-        @PathVariable id: Long,
+        @PathVariable roomId: Long,
         @PathVariable status: String,
-    ) = roomService.updateRoomStatus(id, status)
+    ) = roomService.updateRoomStatus(roomId, status)
 
-    @DeleteMapping("/{id}")
+    @ApiOperation(value = "강연장 삭제", notes = "강연장의 ID를 통해 강연장 정보를 삭제합니다.")
+    @ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer")
+    @DeleteMapping("/{roomId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteRoom(
         authUser: AuthUser,
-        @PathVariable id: Long,
-    ) = roomService.deleteRoom(id);
+        @PathVariable roomId: Long,
+    ) = roomService.deleteRoom(roomId);
 }

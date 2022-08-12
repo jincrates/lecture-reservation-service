@@ -1,5 +1,6 @@
 package me.jincrates.reservation.web
 
+import io.swagger.annotations.*
 import me.jincrates.reservation.config.AuthUser
 import me.jincrates.reservation.domain.validator.LectureValidator
 import me.jincrates.reservation.model.LectureRequest
@@ -11,6 +12,7 @@ import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+@Api(description = "강연 관리")
 @RestController
 @RequestMapping("/api/v1/rooms/{roomId}/lectures")
 class LectureController(
@@ -26,13 +28,23 @@ class LectureController(
         webDataBinder.addValidators(lectureValidator)
     }
 
+    @ApiOperation(value = "강연 등록", notes = "LectureRequest를 통해 강연을 등록합니다.")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer"),
+    ])
     @PostMapping()
     fun createLecture(
         authUser: AuthUser,
         @PathVariable roomId: Long,
         @Valid @RequestBody request: LectureRequest,
-    ) = lectureService.createLecture(roomId, authUser.userId, request)
+    ) = lectureService.createLecture(roomId, authUser.authId, request)
 
+    @ApiOperation(value = "강연 전체 조회", notes = "강연 전체 목록을 조회합니다. 조회기간 조건에 따라 조회 범위를 지정할 수 있습니다. ex) 강의 시작일자 기준: 7일 전 ~ 1일 후까지의 강연 리스트 조회")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer"),
+        ApiImplicitParam(name = "beforeDays", value = "조회기간 시작조건", defaultValue = "7", dataType = "integer"),
+        ApiImplicitParam(name = "afterDays", value = "조회기간 종료조건", defaultValue = "1", dataType = "integer"),
+    ])
     @GetMapping()
     fun getAll(
         authUser: AuthUser,
@@ -41,6 +53,11 @@ class LectureController(
         @RequestParam(required = false, name = "afterDays", defaultValue = "1") afterDays: Long
     ) = lectureService.getAllBeforeDaysBetween(roomId, beforeDays, afterDays)
 
+    @ApiOperation(value = "강연 상세 조회", notes = "강연의 ID를 통해 강연의 상세 정보를 조회합니다.")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID"),
+        ApiImplicitParam(name = "lectureId", value = "강연 ID"),
+    ])
     @GetMapping("/{lectureId}")
     fun getLecture(
         authUser: AuthUser,
@@ -48,6 +65,11 @@ class LectureController(
         @PathVariable lectureId: Long,
     ) = lectureService.getLecture(roomId, lectureId)
 
+    @ApiOperation(value = "강연 신청자 사번 조회", notes = "강연의 ID를 통해 강연 신청자 사번을 조회합니다.")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID", dataType = "integer"),
+        ApiImplicitParam(name = "lectureId", value = "강연 ID", dataType = "integer"),
+    ])
     @GetMapping("/{lectureId}/users")
     fun getLectureUsers(
         authUser: AuthUser,
@@ -55,6 +77,8 @@ class LectureController(
         @PathVariable lectureId: Long,
     ) = lectureService.getLectureUsers(roomId, lectureId)
 
+    @ApiOperation(value = "강연 수정", notes = "강연의 정보를 수정합니다.")
+    @ApiImplicitParam(name = "lectureId", value = "강연장 ID", dataType = "integer")
     @PutMapping("/{lectureId}")
     fun updateLecture(
         authUser: AuthUser,
@@ -62,6 +86,8 @@ class LectureController(
         @Valid @RequestBody request: LectureRequest,
     ) = lectureService.updateLecture(lectureId, request)
 
+    @ApiOperation(value = "강연 삭제", notes = "강연의 ID를 통해 강연 정보를 삭제합니다.")
+    @ApiImplicitParam(name = "lectureId", value = "강연 ID", dataType = "integer")
     @DeleteMapping("/{lectureId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteLecture(
