@@ -12,12 +12,6 @@ group = "me.jincrates"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
-}
-
 repositories {
 	mavenCentral()
 }
@@ -41,6 +35,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3")
 
+	// swagger dependency
+	implementation ("io.springfox:springfox-boot-starter:3.0.0")
+	implementation ("io.springfox:springfox-swagger-ui:3.0.0")
 }
 
 tasks.withType<KotlinCompile> {
