@@ -174,8 +174,8 @@ class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("예약 수정 - 입력값 정상")
-    fun  updateReservationSuccessTest() {
+    @DisplayName("예약 수정 - 상태값 변경1")
+    fun  updateReservationSuccessTest1() {
         val newRoom = createRoom()
         val newLecture = createLecture(newRoom)
         val reservationRequest = ReservationRequest(
@@ -197,6 +197,111 @@ class ReservationControllerTest {
         assertEquals(reservationRequest.userId, reservation?.userId)
         assertEquals(reservationRequest.status, reservation?.status.toString())
     }
+
+    //TODO
+    @Test
+    @DisplayName("예약 수정 - 상태값 변경2 - 예약 승인")
+    fun  updateReservationSuccessTest2() {
+        val newRoom = createRoom()
+        val newLecture = createLecture(newRoom)
+        val reservationRequest = ReservationRequest(
+            userId = "01234",
+            status = "APPROVAL",
+        )
+
+        mockMvc.perform(post("/api/v1/lectures/${newLecture.id}/reservations")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(reservationRequest)))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.lectureId").value(newLecture.id))
+            .andExpect(jsonPath("\$.userId").value(reservationRequest.userId))
+            .andExpect(jsonPath("\$.status").value(reservationRequest.status))
+            .andDo(print())
+
+        val reservation = reservationRepository.findByLectureIdAndUserId(newLecture.id, reservationRequest.userId)
+        assertNotNull(reservation)
+        assertEquals(reservationRequest.userId, reservation?.userId)
+        assertEquals(reservationRequest.status, reservation?.status.toString())
+    }
+
+    //TODO
+    @Test
+    @DisplayName("예약 수정 - 상태값 변경3 - 예약 대기")
+    fun  updateReservationSuccessTest3() {
+        val newRoom = createRoom()
+        val newLecture = createLecture(newRoom)
+        val reservationRequest = ReservationRequest(
+            userId = "01234",
+            status = "APPROVAL",
+        )
+
+        mockMvc.perform(post("/api/v1/lectures/${newLecture.id}/reservations")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(reservationRequest)))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.lectureId").value(newLecture.id))
+            .andExpect(jsonPath("\$.userId").value(reservationRequest.userId))
+            .andExpect(jsonPath("\$.status").value(reservationRequest.status))
+            .andDo(print())
+
+        val reservation = reservationRepository.findByLectureIdAndUserId(newLecture.id, reservationRequest.userId)
+        assertNotNull(reservation)
+        assertEquals(reservationRequest.userId, reservation?.userId)
+        assertEquals(reservationRequest.status, reservation?.status.toString())
+    }
+
+    //TODO
+    @Test
+    @DisplayName("예약 수정 - 상태값 변경4 - 예약 취소")
+    fun  updateReservationSuccessTest4() {
+        val newRoom = createRoom()
+        val newLecture = createLecture(newRoom)
+        val reservationRequest = ReservationRequest(
+            userId = "01234",
+            status = "APPROVAL",
+        )
+
+        mockMvc.perform(post("/api/v1/lectures/${newLecture.id}/reservations")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(reservationRequest)))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.lectureId").value(newLecture.id))
+            .andExpect(jsonPath("\$.userId").value(reservationRequest.userId))
+            .andExpect(jsonPath("\$.status").value(reservationRequest.status))
+            .andDo(print())
+
+        val reservation = reservationRepository.findByLectureIdAndUserId(newLecture.id, reservationRequest.userId)
+        assertNotNull(reservation)
+        assertEquals(reservationRequest.userId, reservation?.userId)
+        assertEquals(reservationRequest.status, reservation?.status.toString())
+    }
+
+    //TODO
+    @Test
+    @DisplayName("예약 수정 - 상태값 변경5 - 예약 취소시 다음 순번 예약자 상태가 대기(WAITING)에서 승인(APPROVAL)으로 자동 변경되는지 확인")
+    fun updateReservationSuccessTest5() {
+        val newRoom = createRoom()
+        val newLecture = createLecture(newRoom)
+        val reservationRequest = ReservationRequest(
+            userId = "01234",
+            status = "APPROVAL",
+        )
+
+        mockMvc.perform(post("/api/v1/lectures/${newLecture.id}/reservations")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(reservationRequest)))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("\$.lectureId").value(newLecture.id))
+            .andExpect(jsonPath("\$.userId").value(reservationRequest.userId))
+            .andExpect(jsonPath("\$.status").value(reservationRequest.status))
+            .andDo(print())
+
+        val reservation = reservationRepository.findByLectureIdAndUserId(newLecture.id, reservationRequest.userId)
+        assertNotNull(reservation)
+        assertEquals(reservationRequest.userId, reservation?.userId)
+        assertEquals(reservationRequest.status, reservation?.status.toString())
+    }
+
 
     private fun createRoom(): Room {
         val room = Room(

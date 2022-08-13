@@ -72,7 +72,7 @@ class ReservationService(
     fun updateReservation(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
-            userId = request.userId
+            userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus(request.status!!)
             reservationRepository.save(this).toResponse()
         }
@@ -82,7 +82,7 @@ class ReservationService(
     fun updateStatusToApproval(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
-            userId = request.userId
+            userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.APPROVAL
             reservationRepository.save(this).toResponse()
         }
@@ -92,7 +92,7 @@ class ReservationService(
     fun updateStatusToWaiting(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
-            userId = request.userId
+            userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.WAITING
             reservationRepository.save(this).toResponse()
         }
@@ -102,7 +102,7 @@ class ReservationService(
     fun updateStatusToCancel(reservationId: Long, request: ReservationRequest): ReservationResponse? {
         val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
-            userId = request.userId
+            userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.CANCEL
             reservationRepository.save(this).toResponse()
         }
