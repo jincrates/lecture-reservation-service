@@ -2,6 +2,7 @@ package me.jincrates.reservation.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.ApiInfoBuilder
@@ -11,8 +12,7 @@ import springfox.documentation.service.ApiInfo
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 
-
-
+//@EnableWebMvc    //Swagger 확인시 해당 주석 해제해야함
 @Configuration
 class SwaggerConfig : WebMvcConfigurer {
     //참고
@@ -21,7 +21,7 @@ class SwaggerConfig : WebMvcConfigurer {
     //http://localhost:8080/swagger-ui/
     //http://localhost:8080/swagger-ui/index.html
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("swagger-ui.html")
+        registry.addResourceHandler("/swagger-ui.html")
             .addResourceLocations("classpath:/META-INF/resources/")
         registry.addResourceHandler("/webjars/**")
             .addResourceLocations("classpath:/META-INF/resources/webjars/")

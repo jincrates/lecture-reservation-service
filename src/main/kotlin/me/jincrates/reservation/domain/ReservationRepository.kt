@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 interface ReservationRepository : JpaRepository<Reservation, Long> {
 
     fun existsByLectureIdAndUserId(lectureId: Long, userId: String): Boolean
-
     fun findByUserId(userId: String): List<Reservation>?
     fun existsByUserId(userId: String): Boolean
+    fun findByLectureIdAndUserId(id: Long?, userId: String): Reservation?
 }

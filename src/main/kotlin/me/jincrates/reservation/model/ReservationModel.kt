@@ -13,12 +13,11 @@ import javax.validation.constraints.NotBlank
 data class ReservationRequest(
 
     @ApiModelProperty(value = "예약자 사번", required = true)
-    @field: NotBlank(message = "신청자 사번을 입력하지 않았습니다.")
-    @field: Length(min = 5, max = 5, message = "사번은 5자리입니다.")
+    @field: Length(min = 5, max = 5, message = "사번이 잘못되었습니다. 사번은 5자리입니다.")
     val userId: String,
 
     @ApiModelProperty(value = "예약 상태")
-    val status: String?,
+    val status: String? = "approval",
 )
 
 @ApiModel(description = "예약 응답 객체입니다.")

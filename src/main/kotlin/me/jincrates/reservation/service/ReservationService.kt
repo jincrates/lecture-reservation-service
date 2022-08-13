@@ -24,7 +24,7 @@ class ReservationService(
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
 
         if (reservationRepository.existsByLectureIdAndUserId(lectureId, request.userId)) {
-            throw BadRequestException("이미 강연을 신청하셨습니다.")
+            throw BadRequestException("이미 신청하신 강연입니다.")
         }
 
         //TODO: lecture.reservations.size가 아니라 approval 상태의 reservaiotns 카운트를 가져와야한다.
