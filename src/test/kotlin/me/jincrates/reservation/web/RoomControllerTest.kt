@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
@@ -182,17 +181,15 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 수정 - 입력값 정상")
     fun editRoomSuccess() {
-        createRooms()
-
-        val roomId: Long = 1
-        assertTrue(roomRepository.existsById(roomId))
+        val room = createRoom()
+        assertNotNull(room)
 
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
             limitOfPersons = 30,
             status = CommonStatus("ACTIVE").toString(),
         )
-        mockMvc.perform(put("/api/v1/admin/rooms/$roomId")
+        mockMvc.perform(put("/api/v1/admin/rooms/${room.id}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
@@ -201,19 +198,20 @@ class RoomControllerTest {
             .andExpect(jsonPath("\$.status").value(roomRequest.status.toString()))
             .andDo(print())
 
-        val room = roomRepository.findByTitle(roomRequest.title)
+        val modRoom = roomRepository.findByTitle(roomRequest.title)
         assertNotNull(room)
-        assertEquals(roomRequest.title, room?.title)
-        assertEquals(roomRequest.limitOfPersons, room?.limitOfPersons)
-        assertEquals(roomRequest.status, room?.status.toString())
+        assertEquals(roomRequest.title, modRoom?.title)
+        assertEquals(roomRequest.limitOfPersons, modRoom?.limitOfPersons)
+        assertEquals(roomRequest.status, modRoom?.status.toString())
     }
 
     @Test
     @DisplayName("강연장 수정 - 입력값 오류1 - id 없음")
     fun editRoomFail1() {
-        createRooms()
+        val room = createRoom()
+        assertNotNull(room)
 
-        val roomId: Long = 99
+        val roomId = 99L
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
             limitOfPersons = 30,
@@ -231,30 +229,29 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 수정 - 입력값 오류2 - 강연장 수용인원은 강연의 예약마감인원보다 커야한다.")
     fun editRoomFail2() {
-        createRooms()
-
-        val roomId: Long = 2
-        val room = roomRepository.findByIdOrNull(roomId)
+        val room = createRoom()
         assertNotNull(room)
 
         val lectureRequest = LectureRequest(
             title = "강연 제목입니다.",
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
-            limitOfReservations = room!!.limitOfPersons,
+            limitOfReservations = room.limitOfPersons,
             openedAt = LocalDateTime.now().plusDays(1),
             closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
         )
-        val createLecture = lectureService.createLecture(roomId, "94042", lectureRequest)
+        //강의 등록(예약마감인원과 강의장 수용인원기 같게 등록)
+        val createLecture = lectureService.createLecture(room.id!!, "94042", lectureRequest)
         assertNotNull(createLecture)
 
-        val limitOfReservationsDown = createLecture.limitOfReservations - 10
+        //강연장 수용인원 변경시 에러 발생하는지 테스트
+        val downLimitOfReservations = createLecture.limitOfReservations - 10
         val roomRequest = RoomRequest(
             title = "테스트 강연장 - 수정",
-            limitOfPersons = limitOfReservationsDown,
+            limitOfPersons = downLimitOfReservations,
             status = CommonStatus("ACTIVE").toString(),
         )
-        mockMvc.perform(put("/api/v1/admin/rooms/$roomId")
+        mockMvc.perform(put("/api/v1/admin/rooms/${room.id}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(roomRequest)))
             .andExpect(status().isOk)
@@ -266,16 +263,26 @@ class RoomControllerTest {
     @Test
     @DisplayName("강연장 삭제")
     fun deleteRoom() {
-        createRooms()
+        val room = createRoom()
+        assertNotNull(room)
 
-        val roomId: Long = 10
-        mockMvc.perform(delete("/api/v1/admin/rooms/$roomId")
+        mockMvc.perform(delete("/api/v1/admin/rooms/${room.id}")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent)
             .andDo(print())
 
-        val room = roomRepository.existsById(roomId)
-        assertFalse(room)
+        val existRoom = roomRepository.existsById(room.id!!)
+        assertFalse(existRoom)
+    }
+
+    fun createRoom(): Room {
+        val room = Room(
+            title = "테스트 강연장",
+            limitOfPersons = 20,
+            status = CommonStatus.ACTIVE,
+            createdBy = "94042",
+        )
+        return roomRepository.save(room)
     }
 
     fun createRooms() {
@@ -300,6 +307,6 @@ class RoomControllerTest {
             rooms.add(room)
         }
 
-        roomRepository.saveAll(rooms)
+        roomRepository.saveAllAndFlush(rooms)
     }
 }
