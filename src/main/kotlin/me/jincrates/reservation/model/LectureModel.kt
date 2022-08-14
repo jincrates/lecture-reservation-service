@@ -3,9 +3,9 @@ package me.jincrates.reservation.model
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import io.swagger.annotations.ApiOperation
 import me.jincrates.reservation.domain.Lecture
 import me.jincrates.reservation.domain.Reservation
+import me.jincrates.reservation.domain.enums.ReservationStatus
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import javax.validation.constraints.Min
@@ -198,7 +198,7 @@ data class LectureUsersResponse(
     val updatedAt: LocalDateTime?,
 )
 
-fun Lecture.toResponseUsers() = LectureUsersResponse(
+fun Lecture.toResponseUsers(status: String) = LectureUsersResponse(
     id = id!!,
     roomId = room.id!!,
     title = title,
@@ -207,7 +207,70 @@ fun Lecture.toResponseUsers() = LectureUsersResponse(
     limitOfReservations = limitOfReservations,
     openedAt = openedAt,
     closedAt = closedAt,
-    users = reservations.sortedBy(Reservation::userId).map(Reservation::userId),
+    users = reservations.sortedBy(Reservation::userId).filter { it.status == ReservationStatus(status) }.map(Reservation::userId),
+    createdBy = createdBy,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)
+
+@ApiModel(description = "인기 강연 응답 객체입니다.")
+data class LecturePopularResponse(
+
+    @ApiModelProperty(value = "강연 ID")
+    val id: Long? = null,
+
+    @ApiModelProperty(value = "강연장 ID")
+    val roomId: Long,
+
+    @ApiModelProperty(value = "강연 제목")
+    val title: String,
+
+    @ApiModelProperty(value = "강연 상세내용")
+    val description: String,
+
+    @ApiModelProperty(value = "강연자명")
+    val lecturerName: String,
+
+    @ApiModelProperty(value = "예약 마감인원")
+    val limitOfReservations: Int,
+
+    @ApiModelProperty(value = "강연 시작일시", example = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val openedAt: LocalDateTime,
+
+    @ApiModelProperty(value = "강연 종료일시", example = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val closedAt: LocalDateTime,
+
+    @ApiModelProperty(value = "승인 예약자 수")
+    val reservationApprovalCount: Int,
+
+    @ApiModelProperty(value = "대기 예약자 수")
+    val reservationWaitingCount: Int,
+
+    @ApiModelProperty(value = "생성자")
+    val createdBy: String,
+
+    @ApiModelProperty(value = "생성일시", example = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val createdAt: LocalDateTime?,
+
+    @ApiModelProperty(value = "수정일시", example = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    val updatedAt: LocalDateTime?,
+)
+
+fun Lecture.toResponsePopular() = LecturePopularResponse(
+    id = id!!,
+    roomId = room.id!!,
+    title = title,
+    description = description,
+    lecturerName = lecturerName,
+    limitOfReservations = limitOfReservations,
+    openedAt = openedAt,
+    closedAt = closedAt,
+    reservationApprovalCount = reservations.filter { it.status == ReservationStatus("APPROVAL") }.size,
+    reservationWaitingCount = reservations.filter { it.status == ReservationStatus("WAITING") }.size,
     createdBy = createdBy,
     createdAt = createdAt,
     updatedAt = updatedAt,

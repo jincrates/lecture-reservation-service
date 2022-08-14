@@ -67,6 +67,12 @@ class LectureService(
     }
 
     @Transactional(readOnly = true)
+    fun getPopularLecture(roomId: Long): List<LecturePopularResponse>? {
+        return lectureRepository.findByRoomIdWithMostPopularFor3days(roomId)
+            ?.map { it.toResponsePopular() }
+    }
+
+    @Transactional(readOnly = true)
     fun getLecture(roomId: Long, lectureId: Long): LectureResponse {
         roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
@@ -74,10 +80,10 @@ class LectureService(
     }
 
     @Transactional(readOnly = true)
-    fun getLectureUsers(roomId: Long, lectureId: Long): LectureUsersResponse {
+    fun getLectureUsers(roomId: Long, lectureId: Long, status: String): LectureUsersResponse {
         roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
-        return lecture.toResponseUsers()
+        return lecture.toResponseUsers(status)
     }
 
     /**

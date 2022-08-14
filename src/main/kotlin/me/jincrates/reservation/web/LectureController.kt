@@ -53,6 +53,16 @@ class LectureController(
         @RequestParam(required = false, name = "afterDays", defaultValue = "1") afterDays: Long
     ) = lectureService.getAllBeforeDaysBetween(roomId, beforeDays, afterDays)
 
+    @ApiOperation(value = "인기 강연 조회", notes = "최근 3일간 가장 신청이 많은 강연순으로 리스트를 조회합니다.")
+    @ApiImplicitParams(*[
+        ApiImplicitParam(name = "roomId", value = "강연장 ID"),
+    ])
+    @GetMapping("/popular")
+    fun getPopularLecture(
+        authUser: AuthUser,
+        @PathVariable roomId: Long,
+    ) = lectureService.getPopularLecture(roomId)
+
     @ApiOperation(value = "강연 상세 조회", notes = "강연의 ID를 통해 강연의 상세 정보를 조회합니다.")
     @ApiImplicitParams(*[
         ApiImplicitParam(name = "roomId", value = "강연장 ID"),
@@ -75,7 +85,8 @@ class LectureController(
         authUser: AuthUser,
         @PathVariable roomId: Long,
         @PathVariable lectureId: Long,
-    ) = lectureService.getLectureUsers(roomId, lectureId)
+        @RequestParam(required = false, name = "status", defaultValue = "APPROVAL") status: String
+    ) = lectureService.getLectureUsers(roomId, lectureId, status)
 
     @ApiOperation(value = "강연 수정", notes = "강연의 정보를 수정합니다.")
     @ApiImplicitParam(name = "lectureId", value = "강연장 ID")
