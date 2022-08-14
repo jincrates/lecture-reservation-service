@@ -14,6 +14,7 @@
 
 ## 기능소개
 작성예정
+
 <br/><br/>
 
 ## ERD 설계
@@ -43,7 +44,7 @@
 <br/>
 
 ## API Reference
-[API 문서](https://github.com/jincrates/lecture-reservation-service/blob/main/docs/apis.md) 를 참조 
+[API 문서](https://github.com/jincrates/lecture-reservation-service/blob/main/docs/apis.md)를 참조하시길 바랍니다. 
 
 <br/>
 
