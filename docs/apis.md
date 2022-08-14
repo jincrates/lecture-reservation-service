@@ -1,7 +1,7 @@
 # API Reference
 * 강연장, 강연, 예약에 대한 API 구현
 * 필수 구현 API 목록에는 ![필수](https://img.shields.io/badge/필수-FF0000.svg) 표기
-
+<br/><br/>
 
 ## 강연장 API
 | Method | URI | Description | Request Body | Response Body | etc |
@@ -12,6 +12,7 @@
 | PUT | /api/v1/admin/rooms/{roomId} | 강연장 수정 | RoomRequest | RoomResponse | 권한 관련 하단 참조 |
 | PUT | /api/v1/admin/rooms/{roomId}/{status} | 강연장 상태 수정 | RoomRequest | RoomResponse | 권한 관련 하단 참조 |
 | DELETE | /api/v1/admin/rooms/{roomId} | 강연장 삭제 | - | - | 204 NO_CONTENT |
+<br/>
 
 ## 강연 API
 | Method | URI | Description | Request Body | Response Body | etc |
@@ -23,6 +24,7 @@
 | POST | /api/v1/rooms/{roomId}/lectures ![필수](https://img.shields.io/badge/필수-FF0000.svg) | 강연 등록 | LectureRequest | LectureResponse | 권한관련 하단 참조 |
 | PUT | /api/v1/rooms/{roomId}/lectures/{lectureId} | 강연장 수정 | LectureRequest | LectureResponse | - |
 | DELETE | /api/v1/rooms/{roomId}/lectures/{lectureId} | 강연장 삭제 | - | - | 204 NO_CONTENT |
+<br/>
 
 ## 예약 API
 | Method | URI | Description | Request Body | Response Body | etc |
@@ -35,6 +37,7 @@
 | PUT | /api/v1/lectures/{lectureId}/reservations/{reservationId}/waiting | 예약 대기 | ReservationRequest | ReservationResponse | - |
 | PUT | /api/v1/lectures/{lectureId}/reservations/{reservationId}/cancel ![필수](https://img.shields.io/badge/필수-FF0000.svg) | 예약 취소 | ReservationRequest | ReservationResponse | - |
 | DELETE | /api/v1/lectures/{lectureId}/reservations/{reservationId} | 예약 삭제 | - | - | 204 NO_CONTENT |
+
 <br/>
 
 ## Request
@@ -50,6 +53,7 @@
 - 강연장명, 수용인원, 상태(ACTIVE/INACTIVE)를 입력받습니다.(status 생략 가능)
 - `title`: 공백일 수 없고, 50자 제한입니다.
 - `limitOfPersons`: 1 이상이고, 수정시 신청된 강연의 예약 마감인원보다 크거나 같아야 합니다.  
+<br/>
 
 ### LectureRequest 예시
 ```
@@ -69,6 +73,7 @@
 - `limitOfReservations`: 1 이상이고, 수정시 승인된 신청자 수보다 크거나 같아야 합니다.
 - `openedAt`: yyy-MM-dd HH:mm:ss 포맷입니다.
 - `closedAt`: yyy-MM-dd HH:mm:ss 포맷이고 시작일시 이전으로 지정할 수 없습니다.
+<br/>
 
 ### ReservationRequest 예시
 ```
