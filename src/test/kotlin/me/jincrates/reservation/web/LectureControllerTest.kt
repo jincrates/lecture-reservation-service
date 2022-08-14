@@ -8,6 +8,7 @@ import me.jincrates.reservation.domain.RoomRepository
 import me.jincrates.reservation.domain.enums.CommonStatus
 import me.jincrates.reservation.model.LectureRequest
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -204,7 +205,7 @@ class LectureControllerTest {
         assertNull(lecture)
     }
 
-    @Test
+    @Disabled @Test //강연 시작일자가 등록일자보다 이전인 경우에도 등록될 수 있도록 변경하였습니다.
     @DisplayName("강연 등록 - 입력값 오류6 - 강연 시작일자가 등록일자보다 이전인 경우")
     fun createLectureFailTest6() {
         val newRoom = createRoom()

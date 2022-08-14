@@ -24,7 +24,7 @@ class Room (
     @Column(nullable = false)
     var createdBy: String,   //생성자 사번
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     val lectures: MutableList<Lecture> = mutableListOf(),
 
 ) : BaseEntity()

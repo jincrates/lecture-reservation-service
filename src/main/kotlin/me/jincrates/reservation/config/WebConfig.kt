@@ -1,8 +1,6 @@
 package me.jincrates.reservation.config
 
 import io.swagger.annotations.ApiModelProperty
-import io.swagger.annotations.ApiParam
-import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.MethodParameter
 import org.springframework.stereotype.Component

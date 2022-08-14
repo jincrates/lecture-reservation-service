@@ -16,10 +16,12 @@ class LectureValidator : Validator {
     override fun validate(target: Any, errors: Errors) {
         val request: LectureRequest = target as LectureRequest
 
+        /*
+        //강연 시작일자는 오늘 이전으로도 지정할 수 있도록 하겠다.
         if (isNotValidOpenedAt(request)) {
             errors.rejectValue("openedAt", "invalid.createdAt", "강연 시작일시를 정확히 입력하세요.")
         }
-
+        */
         if (isNotValidClosedAt(request)) {
             errors.rejectValue("closedAt", "invalid.closedAt", "강연 종료일시를 정확히 입력하세요.")
         }
