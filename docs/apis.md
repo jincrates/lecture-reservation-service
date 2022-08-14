@@ -1,5 +1,6 @@
 # API Reference
 * 강연장, 강연, 예약에 대한 API 구현
+* 필수 구현 API 목록에는 ![필수](https://img.shields.io/badge/필수-FF0000.svg)를 붙였습니다.
 
 
 ## 강연장 API
