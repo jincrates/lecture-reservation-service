@@ -37,19 +37,21 @@
 | DELETE | /api/v1/lectures/{lectureId}/reservations/{reservationId} | 예약 삭제 | - | - | 204 NO_CONTENT |
 <br/>
 
-### Request
+## Request
 
-#### RoomRequest 예시
+### RoomRequest 예시
 ```
 {
-    "title": "강연장명",
+    "title": "강연장명",  
     "limitOfPersons": "99",
     "status": "active"
 }
 ```
 - 강연장명, 수용인원, 상태(ACTIVE/INACTIVE)를 입력받습니다.(status 생략 가능)
+- `title`: 공백일 수 없고, 50자 제한입니다.
+- `limitOfPersons`: 1 이상이고, 수정시 신청된 강연의 예약 마감인원보다 크거나 같아야 합니다.  
 
-#### LectureRequest 예시
+### LectureRequest 예시
 ```
 {
     "title": "강연 제목",
@@ -61,21 +63,14 @@
 }
 ```
 - 강연제목, 상세내용, 강연자 이름, 예약 마감인원, 강의 시작일시, 강의 종료일시를 입력받습니다.
+- `title`: 공백일 수 없고, 50자 제한입니다.
+- `description`: 공백일 수 없습니다.
+- `lectureName`: 공백일 수 없습니다.
+- `limitOfReservations`: 1 이상이고, 수정시 승인된 신청자 수보다 크거나 같아야 합니다.
+- `openedAt`: yyy-MM-dd HH:mm:ss 포맷입니다.
+- `closedAt`: yyy-MM-dd HH:mm:ss 포맷이고 시작일시 이전으로 지정할 수 없습니다.
 
-#### LectureRequest 예시
-```
-{
-    "title": "강연 제목",
-    "description": "강연 상세내용",
-    "lecturerName": "강연자명",
-    "limitOfReservations": "99",
-    "openedAt": "2022-12-31 09:00:00",
-    "closedAt": "2022-12-31 12:00:00"
-}
-```
-- 강연제목, 상세내용, 강연자 이름, 예약 마감인원, 강의 시작일시, 강의 종료일시를 입력받습니다.
-
-#### ReservationRequest 예시
+### ReservationRequest 예시
 ```
 {
     "userId": "12345",
@@ -83,3 +78,4 @@
 }
 ```
 - 신청자 사번, 예약 상태(approval/waiting/canel)를 입력받습니다.(status 생략 가능)
+- `userId`: 공백일 수 없고, 5자여야합니다.
