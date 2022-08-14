@@ -13,7 +13,7 @@
 작성예정
 
 ## ERD 설계
-![](docs/images/ERD 설계.png)
+<img width="980" alt="ERD 설계" src="https://user-images.githubusercontent.com/53418946/184529238-712b27ab-5449-4533-aabd-2828475b2b49.png">
 
 ## 디렉토리 구조
 ```
@@ -37,4 +37,4 @@
 ``` 
 
 ## API Reference
-API 문서를 참조 
+[API 문서](https://github.com/jincrates/lecture-reservation-service/blob/main/docs/apis.md) 를 참조 
