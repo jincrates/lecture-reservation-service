@@ -1,6 +1,7 @@
 # API Reference
-* 강연장, 강연, 예약에 대한 API 구현
-* 필수 구현 API 목록에는 ![필수](https://img.shields.io/badge/필수-FF0000.svg) 표기
+- 강연장, 강연, 예약에 대한 API 구현
+- 필수 구현 API 목록에는 ![필수](https://img.shields.io/badge/필수-FF0000.svg) 표기
+- [Swagger 스크린샷 보기](#swagger-ui-screenshot)
 <br/><br/>
 
 ## 강연장 API
@@ -72,7 +73,7 @@
 - `lectureName`: 공백일 수 없습니다.
 - `limitOfReservations`: 1 이상이고, 수정시 승인된 신청자 수보다 크거나 같아야 합니다.
 - `openedAt`: yyy-MM-dd HH:mm:ss 포맷입니다.
-- `closedAt`: yyy-MM-dd HH:mm:ss 포맷이고 시작일시 이전으로 지정할 수 없습니다.
+- `closedAt`: yyy-MM-dd HH:mm:ss 포맷이고, 시작일시 이전으로 지정할 수 없습니다.
 <br/>
 
 ### ReservationRequest 예시
@@ -84,3 +85,8 @@
 ```
 - 신청자 사번, 예약 상태(approval/waiting/canel)를 입력받습니다.(status 생략 가능)
 - `userId`: 공백일 수 없고, 5자여야합니다.
+<br/><br/><br/>
+
+
+## Swagger UI Screenshot
+![localhost_8080_swagger-ui_index html](https://user-images.githubusercontent.com/53418946/184538195-82c5583b-cbb4-42ed-8e20-b15a65d1057c.png)
