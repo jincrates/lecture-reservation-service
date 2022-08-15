@@ -31,7 +31,7 @@
 | Method | URI | Description | Request Body | Response Body | etc |
 | --- | --- | --- | --- | --- | --- |
 | GET | /api/v1/lectures/{lectureId}/reservations/{reservationId} | 예약 상세 조회 | - | ReservationResponse | - |
-| GET | /api/v1/lectures/{lectureId}/reservations/{reservationId}/users/{userId} ![필수](https://img.shields.io/badge/필수-FF0000.svg) | 신청자 사번으로 예약 조회 | - | ReservationDetailResponse | - |
+| GET | /api/v1/lectures/{lectureId}/reservations/users/{userId} ![필수](https://img.shields.io/badge/필수-FF0000.svg) | 신청자 사번으로 예약 조회 | - | ReservationDetailResponse | - |
 | POST | /api/v1/lectures/{lectureId}/reservations | 예약 등록 | ReservationRequest | ReservationResponse | 권한관련 하단 참조 |
 | PUT | /api/v1/lectures/{lectureId}/reservations/{reservationId} | 예약 수정 | ReservationRequest | 수ReservationResponse | - |
 | PUT | /api/v1/lectures/{lectureId}/reservations/{reservationId}/approval | 예약 승인 | ReservationRequest | ReservationResponse | - |
