@@ -19,7 +19,7 @@
 
 ## 디렉토리 구조
 ```
-├── docs                            (API Reference, 에러코드, DB 스키마 이미지 등)
+├── docs                            (API Reference, DB 스키마 이미지 등)
 ├── scripts                         (DB 스키마 및 테스트 데이터 스크립트)
 /src/main
 ├── resources
