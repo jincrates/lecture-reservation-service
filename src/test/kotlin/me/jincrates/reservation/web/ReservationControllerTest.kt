@@ -5,7 +5,9 @@ import me.jincrates.reservation.domain.*
 import me.jincrates.reservation.domain.enums.CommonStatus
 import me.jincrates.reservation.domain.enums.ReservationStatus
 import me.jincrates.reservation.model.ReservationRequest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +17,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.*
@@ -34,6 +37,9 @@ class ReservationControllerTest {
     @Autowired lateinit var lectureRepository: LectureRepository
     @Autowired lateinit var roomRepository: RoomRepository
     @Autowired lateinit var reservationRepository: ReservationRepository
+
+    @AfterEach
+    fun after() = reservationRepository.deleteAll()
 
     @Test
     @DisplayName("예약 신청1 - 입력값 정상")
@@ -282,12 +288,36 @@ class ReservationControllerTest {
         assertEquals(ReservationStatus.CANCEL, reservation?.status)
     }
 
+    @Test
+    @DisplayName("예약 삭제")
+    fun deleteReservation() {
+        val room = createRoom()
+        val lecture = createLecture(room)
+        val reservation = createReservation(lecture)
 
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/v1/lectures/${lecture.id}/reservations/${reservation.id}")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent)
+            .andDo(print())
+
+        val existReservation = reservationRepository.existsById(reservation.id!!)
+        assertFalse(existReservation)
+    }
+
+    private fun createReservation(lecture: Lecture): Reservation {
+        val reservation = Reservation(
+            userId = "01234",
+            lecture = lecture,
+            status = ReservationStatus.APPROVAL,
+        )
+        return reservationRepository.save(reservation)
+    }
 
     private fun createRoom(): Room {
         val room = Room(
             title = "테스트 강연장",
-            limitOfPersons = 20,
+            limitOfPersons = 100,
             status = CommonStatus.ACTIVE,
             createdBy = "94042",
         )
@@ -300,7 +330,7 @@ class ReservationControllerTest {
             title = "강연 제목입니다.",
             description = "강연 상세내용입니다.",
             lecturerName = "강연자",
-            limitOfReservations = 20,
+            limitOfReservations = 100,
             openedAt = LocalDateTime.now().plusDays(1),
             closedAt = LocalDateTime.now().plusDays(1).plusHours(2),
             createdBy = "94042"

@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
@@ -348,6 +349,22 @@ class LectureControllerTest {
         )
     }
 
+    @Test
+    @DisplayName("강연 삭제")
+    fun deleteLecture() {
+        val room = createRoom()
+        val newLecture = createLecture(room)
+        assertNotNull(newLecture)
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/v1/rooms/${room.id}/lectures/${newLecture.id}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent)
+            .andDo(print())
+
+        val existLecture = lectureRepository.existsById(newLecture.id!!)
+        assertFalse(existLecture)
+    }
 
     private fun createRoom(): Room {
         val room = Room(

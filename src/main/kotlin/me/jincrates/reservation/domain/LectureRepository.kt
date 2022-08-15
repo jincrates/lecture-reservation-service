@@ -1,9 +1,11 @@
 package me.jincrates.reservation.domain
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import javax.persistence.LockModeType
 
 @Transactional(readOnly = true)
 interface LectureRepository : JpaRepository<Lecture, Long> {
