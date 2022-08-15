@@ -2,7 +2,6 @@ package me.jincrates.reservation.web
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiImplicitParam
-import io.swagger.annotations.ApiImplicitParams
 import io.swagger.annotations.ApiOperation
 import me.jincrates.reservation.config.AuthUser
 import me.jincrates.reservation.model.ReservationRequest
@@ -37,7 +36,7 @@ class ReservationController(
 
     @ApiOperation(value = "예약 조회(신청자 사번으로 조회)", notes = "신청자 사번을 통해 예약 정보를 조회합니다.")
     @ApiImplicitParam(name = "userId", value = "신청자 사번")
-    @GetMapping("/{reservationId}/users/{userId}")
+    @GetMapping("/users/{userId}")
     fun getReservationByUserId(
         authUser: AuthUser,
         @PathVariable userId: String,
@@ -58,8 +57,7 @@ class ReservationController(
     fun updateStatusToApproval(
         authUser: AuthUser,
         @PathVariable reservationId: Long,
-        @Valid @RequestBody request: ReservationRequest,
-    ) = reservationService.updateStatusToApproval(reservationId, request)
+    ) = reservationService.updateStatusToApproval(reservationId)
 
     @PutMapping("/{reservationId}/waiting")
     @ApiOperation(value = "예약 대기", notes = "예약의 상태를 대기로 수정합니다.")
@@ -67,8 +65,7 @@ class ReservationController(
     fun updateStatusToWaiting(
         authUser: AuthUser,
         @PathVariable reservationId: Long,
-        @Valid @RequestBody request: ReservationRequest,
-    ) = reservationService.updateStatusToWaiting(reservationId, request)
+    ) = reservationService.updateStatusToWaiting(reservationId)
 
     @ApiOperation(value = "예약 취소", notes = "예약의 상태를 취소로 수정합니다.")
     @ApiImplicitParam(name = "reservationId", value = "예약 ID")
@@ -76,8 +73,7 @@ class ReservationController(
     fun updateStatusToCancel(
         authUser: AuthUser,
         @PathVariable reservationId: Long,
-        @Valid @RequestBody request: ReservationRequest,
-    ) = reservationService.updateStatusToCancel(reservationId, request)
+    ) = reservationService.updateStatusToCancel(reservationId)
 
     @ApiOperation(value = "예약 삭제", notes = "예약의 ID를 통해 예약 정보를 삭제합니다.")
     @ApiImplicitParam(name = "reservationId", value = "예약 ID")

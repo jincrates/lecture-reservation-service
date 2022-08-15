@@ -37,7 +37,7 @@ class AuthUserHandlerArgumentsResolver : HandlerMethodArgumentResolver {
         //TODO: 이후 인증서버 구축시 변경해야함
 
         return AuthUser(
-            authId = "94042",
+            authId = "00000",
             //username = "사용자"
         )
     }

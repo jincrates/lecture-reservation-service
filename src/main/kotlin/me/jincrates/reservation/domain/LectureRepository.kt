@@ -24,11 +24,11 @@ interface LectureRepository : JpaRepository<Lecture, Long> {
             " where created_at > date_sub(convert(curdate(), datetime), interval 3 day) " +
             " and status in ('APPROVAL', 'WAITING') " +
             " group by lecture_id " +
-            " order by reservation_count desc " +
             " ) " +
-            " select pl.reservation_count, l.* " +
-            " from temp_popular_lecture pl " +
-            " left outer join lecture l on pl.lecture_id = l.id ", nativeQuery = true)
+            " select l.* from lecture l " +
+            " left outer join temp_popular_lecture pl on l.id = pl.lecture_id " +
+            " where l.room_id = :roomId" +
+            " order by pl.reservation_count desc, l.opened_at asc ", nativeQuery = true)
     fun findByRoomIdWithMostPopularFor3days(roomId: Long): List<Lecture>?
 
 }
