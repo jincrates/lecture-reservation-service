@@ -49,6 +49,8 @@
 ### 구현하면서 어려웠던 점
 수정시 고려해야할 부분
 동시성에 대한 이슈. 어떻게 해결했는지. 
+[예약시스템으로 통해 알아보는 동시성 문제](https://github.com/jincrates/kotlin-workspace/tree/main/concurrency-problems)
+
 
 ### 보완이 필요한 점
 인증정보에 대한 관리, 권한 설정 
