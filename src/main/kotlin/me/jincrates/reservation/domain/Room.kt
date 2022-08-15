@@ -25,6 +25,6 @@ class Room (
     var createdBy: String,   //생성자 사번
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    val lectures: MutableList<Lecture> = mutableListOf(),
+    val lectures: MutableSet<Lecture> = mutableSetOf(),
 
-) : BaseEntity()
+    ) : BaseEntity()

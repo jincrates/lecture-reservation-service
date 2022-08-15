@@ -34,6 +34,6 @@ interface LectureRepository : JpaRepository<Lecture, Long> {
             " order by pl.reservation_count desc, l.opened_at asc ", nativeQuery = true)
     fun findByRoomIdWithMostPopularFor3days(roomId: Long): List<Lecture>?
 
-    @Query("select distinct l from Lecture l join fetch l.reservations")
+    @Query("select distinct l from Lecture l left join fetch l.reservations r where l.room = :roomId")
     fun findAllByRoomIdWithReservationUsingFetchJoin(roomId: Long): List<Lecture>?
 }
