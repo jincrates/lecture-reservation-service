@@ -10,10 +10,6 @@
 ![Generic badge](https://img.shields.io/badge/2.7.2-SpringBoot-6DB33F.svg)
 ![Generic badge](https://img.shields.io/badge/8.0-MySQL-01578B.svg)
 ![Generic badge](https://img.shields.io/badge/5.0-JUnit-DD524A.svg)
-<br/><br/>
-
-## 기능소개
-작성예정
 
 <br/><br/>
 
