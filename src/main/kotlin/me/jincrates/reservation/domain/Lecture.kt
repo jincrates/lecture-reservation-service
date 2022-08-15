@@ -37,7 +37,7 @@ class Lecture (
     var createdBy: String,       //생성자 사번
 
     //하나의 강의에 여러 예약이 있을 수 있기 떄문
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "lecture", fetch = FetchType.LAZY)
     val reservations: MutableSet<Reservation> = mutableSetOf(),
 
     ) : BaseEntity()
