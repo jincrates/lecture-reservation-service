@@ -18,6 +18,9 @@ interface LectureRepository : JpaRepository<Lecture, Long> {
 
     fun findByRoomIdAndOpenedAtBetween(roomId: Long, fromDate: LocalDateTime, toDate: LocalDateTime): List<Lecture>?
 
+    @Query("select distinct l from Lecture l join fetch l.reservations")
+    fun findByRoomIdAndOpenedAtBetweenUsingFetchJoin(roomId: Long, fromDate: LocalDateTime, toDate: LocalDateTime): List<Lecture>?
+
     @Query(" with temp_popular_lecture as ( " +
             " select lecture_id, count(lecture_id) as 'reservation_count' " +
             " from reservation " +
@@ -31,4 +34,6 @@ interface LectureRepository : JpaRepository<Lecture, Long> {
             " order by pl.reservation_count desc, l.opened_at asc ", nativeQuery = true)
     fun findByRoomIdWithMostPopularFor3days(roomId: Long): List<Lecture>?
 
+    @Query("select distinct l from Lecture l join fetch l.reservations")
+    fun findAllByRoomIdWithReservationUsingFetchJoin(roomId: Long): List<Lecture>?
 }

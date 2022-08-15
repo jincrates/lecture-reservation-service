@@ -52,7 +52,7 @@ class LectureService(
      */
     @Transactional(readOnly = true)
     fun getAll(roomId: Long) =
-        lectureRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)?.map { it.toResponse() }
+        lectureRepository.findAllByRoomIdWithReservationUsingFetchJoin(roomId)?.map { it.toResponse() }
 
     /**
      * 강연 전체 조회(기간)
@@ -62,7 +62,7 @@ class LectureService(
         val now = LocalDate.now()
         val fromDate = now.atStartOfDay().minusDays(beforeDays)
         val toDate = now.atTime(LocalTime.MAX).plusDays(afterDays)
-        return lectureRepository.findByRoomIdAndOpenedAtBetween(roomId, fromDate, toDate)
+        return lectureRepository.findByRoomIdAndOpenedAtBetweenUsingFetchJoin(roomId, fromDate, toDate)
             ?.map { it.toResponse() }
     }
 
@@ -112,4 +112,6 @@ class LectureService(
             lectureRepository.delete(lecture)
         }
     }
+
+
 }

@@ -39,7 +39,7 @@ class RoomService(
      */
     @Transactional(readOnly = true)
     fun getAll(status: CommonStatus) =
-        roomRepository.findAllByStatusOrderByCreatedAtDesc(status)?.map { it.toResponse() } //맵을 통해 Room를 RoomResponse로 변환
+        roomRepository.findAllWithLectureUsingFetchJoin()?.map { it.toResponse() } //맵을 통해 Room를 RoomResponse로 변환
 
     /**
      * 강연장 상세 조회
