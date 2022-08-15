@@ -70,7 +70,7 @@ class ReservationService(
 
     @Transactional
     fun updateReservation(reservationId: Long, request: ReservationRequest): ReservationResponse? {
-        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        val reservation = reservationRepository.findByIdWithPessimisticLock(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         if (reservation.userId != request.userId) {
             throw BadRequestException("권한이 없습니다.")
         }
@@ -83,7 +83,7 @@ class ReservationService(
 
     @Transactional
     fun updateStatusToApproval(reservationId: Long): ReservationResponse? {
-        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        val reservation = reservationRepository.findByIdWithPessimisticLock(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
             userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.APPROVAL
@@ -93,7 +93,7 @@ class ReservationService(
 
     @Transactional
     fun updateStatusToWaiting(reservationId: Long): ReservationResponse? {
-        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        val reservation = reservationRepository.findByIdWithPessimisticLock(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
             userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.WAITING
@@ -103,34 +103,20 @@ class ReservationService(
 
     @Transactional
     fun updateStatusToCancel(reservationId: Long): ReservationResponse? {
-        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
+        val reservation = reservationRepository.findByIdWithPessimisticLock(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
         return with(reservation) {
             userId = reservation.userId  //예약자 사번은 못바꾼다.
             status = ReservationStatus.CANCEL
             reservationRepository.save(this).toResponse()
         }
     }
-
-    @Transactional
-    fun updateStatusToCancelFromUserId(reservationId: Long, request: ReservationRequest): ReservationResponse? {
-        val reservation = reservationRepository.findByIdOrNull(reservationId) ?: throw NotFoundException("예약 내역이 없습니다.")
-        return with(reservation) {
-            userId = reservation.userId  //예약자 사번은 못바꾼다.
-            status = ReservationStatus.CANCEL
-            reservationRepository.save(this).toResponse()
-        }
-    }
-
 
     @Transactional
     fun deleteReservation(lectureId: Long, reservationId: Long) {
-        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        val lecture = lectureRepository.findByIdWithPessimisticLock(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         reservationRepository.findByIdOrNull(reservationId)?.let { reservation ->
             lecture.reservations.remove(reservation)
             reservationRepository.delete(reservation)
         }
     }
-
-
-
 }

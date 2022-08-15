@@ -55,7 +55,7 @@ class RoomService(
      */
     @Transactional
     fun updateRoom(id: Long, request: RoomRequest): RoomResponse? {
-        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val room = roomRepository.findByIdWithPessimisticLock(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
 
         //강연장 수용인원
         room.lectures.forEach {
@@ -77,7 +77,7 @@ class RoomService(
      */
     @Transactional
     fun updateRoomStatus(id: Long, status: String): RoomResponse {
-        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val room = roomRepository.findByIdWithPessimisticLock(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         return with(room) {
             this.status = CommonStatus(status)
             roomRepository.save(this).toResponse()
@@ -89,7 +89,7 @@ class RoomService(
      */
     @Transactional
     fun deleteRoom(id: Long) {
-        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val room = roomRepository.findByIdWithPessimisticLock(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         roomRepository.deleteById(id)
     }
 }

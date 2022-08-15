@@ -35,10 +35,8 @@ class AuthUserHandlerArgumentsResolver : HandlerMethodArgumentResolver {
     ): Any? {
 
         //TODO: 이후 인증서버 구축시 변경해야함
-
         return AuthUser(
             authId = "00000",
-            //username = "사용자"
         )
     }
 }
@@ -46,5 +44,4 @@ class AuthUserHandlerArgumentsResolver : HandlerMethodArgumentResolver {
 data class AuthUser(
     @ApiModelProperty(value = "인증키(사용자 사번)", required = true)
     val authId: String,      //사원번호
-    //val username: String,  //사원명
 )

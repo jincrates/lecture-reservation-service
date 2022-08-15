@@ -16,7 +16,7 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
 
     fun findByLectureIdAndUserId(id: Long?, userId: String): Reservation?
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query("select r from reservation r where r.id = :id")
-//    fun findByIdWithPessimisticLock(id: Long) : Reservation?
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from Reservation r where r.id = :id")
+    fun findByIdWithPessimisticLock(id: Long): Reservation?
 }

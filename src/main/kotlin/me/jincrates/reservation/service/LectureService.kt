@@ -66,6 +66,9 @@ class LectureService(
             ?.map { it.toResponse() }
     }
 
+    /**
+     * 인기강연 조회
+     */
     @Transactional(readOnly = true)
     fun getPopularLecture(roomId: Long): List<LecturePopularResponse>? {
         return lectureRepository.findByRoomIdWithMostPopularFor3days(roomId)
@@ -92,7 +95,7 @@ class LectureService(
      */
     @Transactional
     fun updateLecture(lectureId: Long, request: LectureRequest): LectureResponse {
-        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        val lecture = lectureRepository.findByIdWithPessimisticLock(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         return with(lecture) {
             title = request.title
             description = request.description
@@ -106,12 +109,10 @@ class LectureService(
 
     @Transactional
     fun deleteLecture(roomId: Long, lectureId: Long) {
-        val room = roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val room = roomRepository.findByIdWithPessimisticLock(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         lectureRepository.findByIdOrNull(lectureId)?.let { lecture ->
             room.lectures.remove(lecture)
             lectureRepository.delete(lecture)
         }
     }
-
-
 }

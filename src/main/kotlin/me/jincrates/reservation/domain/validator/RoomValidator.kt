@@ -14,6 +14,5 @@ class RoomValidator : Validator {
 
     override fun validate(target: Any, errors: Errors) {
         val request: RoomRequest = target as RoomRequest
-
     }
 }
