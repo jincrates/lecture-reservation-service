@@ -85,7 +85,7 @@ class LectureService(
     @Transactional(readOnly = true)
     fun getLectureUsers(roomId: Long, lectureId: Long, status: String): LectureUsersResponse {
         roomRepository.findByIdOrNull(roomId) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
-        val lecture = lectureRepository.findByIdOrNull(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
+        val lecture = lectureRepository.findByLectureIdWithReservationUsingFetchJoin(lectureId) ?: throw NotFoundException("강연이 존재하지 않습니다.")
         return lecture.toResponseUsers(status)
     }
 

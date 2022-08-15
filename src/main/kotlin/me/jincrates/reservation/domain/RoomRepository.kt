@@ -16,6 +16,9 @@ interface RoomRepository : JpaRepository<Room, Long> {
     @Query("select distinct r from Room r join fetch r.lectures l left join fetch l.reservations")
     fun findAllWithLectureUsingFetchJoin(): List<Room>?
 
+    @Query("select distinct r from Room r join fetch r.lectures l left join fetch l.reservations where r.id = :id")
+    fun findByIdWithLectureUsingFetchJoin(id: Long): Room?
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select r from Room r where r.id = :id")
     fun findByIdWithPessimisticLock(id: Long): Room?

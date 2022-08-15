@@ -40,4 +40,7 @@ interface LectureRepository : JpaRepository<Lecture, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select l from Lecture l where l.id = :id")
     fun findByIdWithPessimisticLock(id: Long): Lecture?
+
+    @Query("select distinct l from Lecture l left join fetch l.reservations r where l.id = :id")
+    fun findByLectureIdWithReservationUsingFetchJoin(id: Long): Lecture?
 }

@@ -46,7 +46,7 @@ class RoomService(
      */
     @Transactional(readOnly = true)
     fun getRoom(id: Long): RoomResponse {
-        val room = roomRepository.findByIdOrNull(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
+        val room = roomRepository.findByIdWithLectureUsingFetchJoin(id) ?: throw NotFoundException("강연장이 존재하지 않습니다.")
         return room.toResponse()
     }
 
