@@ -18,7 +18,7 @@ class Lecture (
     var title: String,   //강연 제목
 
     @Column(nullable = false)
-    @Lob @Basic(fetch = FetchType.EAGER)
+    @Lob @Basic(fetch = FetchType.LAZY)
     var description: String,  //상세 내용
 
     @Column(nullable = false)

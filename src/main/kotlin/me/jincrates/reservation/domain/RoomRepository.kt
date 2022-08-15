@@ -13,7 +13,7 @@ interface RoomRepository : JpaRepository<Room, Long> {
     fun findByTitle(title: String): Room?
     fun findAllByStatusOrderByCreatedAtDesc(status: CommonStatus): List<Room>?
 
-    @Query("select distinct r from Room r join fetch r.lectures")
+    @Query("select distinct r from Room r join fetch r.lectures l left join fetch l.reservations")
     fun findAllWithLectureUsingFetchJoin(): List<Room>?
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
